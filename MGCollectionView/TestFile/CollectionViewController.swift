@@ -10,6 +10,8 @@ import UIKit
 
 class CollectionViewController: ViewController, MGCollectionViewProtocol {
     
+    public var cellForRow : (iphonePortrait: Int, iphoneLandscape: Int, ipadPortrait: Int, ipadLandscape: Int)?
+    
     var testarray : [[String]] = []
 
     @IBOutlet weak var collectionView: MGCollectionView!
@@ -29,7 +31,7 @@ class CollectionViewController: ViewController, MGCollectionViewProtocol {
         collectionView.cellNibName = MGCollectionViewCell.identifier
         collectionView.cellProportion = CGSize.init(width: 2, height: 1)
         collectionView.cellsSpacing = (1, 1, 1, 1)
-        collectionView.cellsForRow = (iphonePortrait: 1, iphoneLandscape: 2, ipadPortrait: 3, ipadLandscape: 6)
+        collectionView.cellsForRow = cellForRow != nil ? cellForRow! : (iphonePortrait: 1, iphoneLandscape: 2, ipadPortrait: 3, ipadLandscape: 6)
     }
 
     func itemSelected(item: Any) {

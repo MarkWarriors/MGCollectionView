@@ -8,6 +8,8 @@
 
 import UIKit
 
+
+
 @objc protocol MGCollectionViewProtocol {
     func itemSelected(item: Any)
     func displayItem(_ item: Any, inCell cell: UICollectionViewCell) -> UICollectionViewCell
@@ -16,8 +18,8 @@ import UIKit
 }
 
 @IBDesignable class MGCollectionView : UICollectionView, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout, UICollectionViewDataSource {
-    typealias IntForDeviceAndOrientation = (iphonePortrait: Int, iphoneLandscape: Int, ipadPortrait: Int, ipadLandscape: Int)
-
+    
+    public typealias IntForDeviceAndOrientation = (iphonePortrait: Int, iphoneLandscape: Int, ipadPortrait: Int, ipadLandscape: Int)
     
     //    var emptyCollectionText : String? = nil
     //    var emptyCollectionView : UIView? = nil
