@@ -1,17 +1,19 @@
+
 # MGCollectionView
 Well a collection view that give you to manage few things to get it work right (with adaptive layout for device type and orientation)
 
-INSTALLATION:
+### INSTALLATION:
 Copy the MGCollectionView.swift in your project, and set it as class of an UICollectionView in storyboard (if you use it, or just instantiate in the code)
 
 In the ViewController add the MGCollectionViewProtocol
-The methods of the protocol are:
+#### The methods of the protocol are:
     func itemSelected(item: Any)
     func displayItem(_ item: Any, inCell cell: UICollectionViewCell) -> UICollectionViewCell
     func requestDataForPage(page: Int) -> [Any]
     func refreshControlStatus(animating: Bool) // OPTIONAL!!
    
-And also in the ViewController set the paramters that you want:
+And also in the ViewController set the paramters that you want
+#### Parameters:
     collectionView.protocolDelegate = self // NEEDED
     collectionView.pullToRefresh = true // if you want to add the pulltorefresh
     collectionView.useInfiniteScroll = true // if you want infiniteScroll at the bottom
