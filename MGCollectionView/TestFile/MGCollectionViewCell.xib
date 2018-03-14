@@ -12,18 +12,18 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
-        <view contentMode="scaleToFill" id="iN0-l3-epB" customClass="MGCollectionViewCell" customModule="MGCollectionView" customModuleProvider="target">
+        <view clipsSubviews="YES" contentMode="scaleToFill" id="iN0-l3-epB" customClass="MGCollectionViewCell" customModule="MGCollectionView" customModuleProvider="target">
             <rect key="frame" x="0.0" y="0.0" width="406" height="138"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
-                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="153-M8-SIO">
-                    <rect key="frame" x="8" y="10" width="34" height="21"/>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Title" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="153-M8-SIO">
+                    <rect key="frame" x="8" y="10" width="390" height="21"/>
                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                     <nil key="textColor"/>
                     <nil key="highlightedColor"/>
                 </label>
-                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Subtitle" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Tqq-Vz-Zfg">
-                    <rect key="frame" x="8" y="39" width="59" height="21"/>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Subtitle" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Tqq-Vz-Zfg">
+                    <rect key="frame" x="8" y="39" width="390" height="21"/>
                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                     <nil key="textColor"/>
                     <nil key="highlightedColor"/>
@@ -32,6 +32,9 @@
             <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
             <constraints>
                 <constraint firstItem="153-M8-SIO" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" constant="8" id="7GW-MN-dZ9"/>
+                <constraint firstItem="vUN-kp-3ea" firstAttribute="trailing" secondItem="Tqq-Vz-Zfg" secondAttribute="trailing" constant="8" id="7ux-Fd-9Sz"/>
+                <constraint firstItem="vUN-kp-3ea" firstAttribute="trailing" secondItem="153-M8-SIO" secondAttribute="trailing" constant="8" id="BFu-LM-17S"/>
+                <constraint firstItem="vUN-kp-3ea" firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="Tqq-Vz-Zfg" secondAttribute="bottom" constant="8" id="IVY-fi-OuL"/>
                 <constraint firstItem="Tqq-Vz-Zfg" firstAttribute="top" secondItem="153-M8-SIO" secondAttribute="bottom" constant="8" id="OM0-3k-Tut"/>
                 <constraint firstItem="153-M8-SIO" firstAttribute="top" secondItem="vUN-kp-3ea" secondAttribute="top" constant="10" id="W4Y-1K-iDg"/>
                 <constraint firstItem="Tqq-Vz-Zfg" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" constant="8" id="hLg-KT-NPM"/>

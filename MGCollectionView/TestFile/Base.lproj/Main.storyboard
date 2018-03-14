@@ -34,11 +34,11 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="yA9-Fa-7gp">
+                            <button opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="350" horizontalCompressionResistancePriority="500" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="yA9-Fa-7gp">
                                 <rect key="frame" x="112" y="593" width="150" height="44"/>
                                 <color key="backgroundColor" cocoaTouchSystemColor="darkTextColor"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" constant="150" id="bSs-OG-vfx"/>
+                                    <constraint firstAttribute="width" priority="750" constant="150" id="bSs-OG-vfx"/>
                                     <constraint firstAttribute="height" constant="44" id="emy-vY-udp"/>
                                 </constraints>
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="16"/>
@@ -49,56 +49,137 @@
                                     <segue destination="Tew-vZ-hgY" kind="show" identifier="toMgCollectionView" id="7up-yL-XNN"/>
                                 </connections>
                             </button>
-                            <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="iPhone Portrait" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="Kg8-WH-TsI" customClass="MGTextField" customModule="MGCollectionView" customModuleProvider="target">
-                                <rect key="frame" x="127.5" y="28" width="120" height="30"/>
+                            <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="iPhone Portrait" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="Kg8-WH-TsI">
+                                <rect key="frame" x="163" y="98" width="50" height="30"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" constant="120" id="jkD-l4-lhd"/>
+                                    <constraint firstAttribute="width" constant="50" id="jkD-l4-lhd"/>
                                 </constraints>
                                 <nil key="textColor"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits" keyboardType="numberPad"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="boolean" keyPath="floatingPlaceholder" value="YES"/>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="leftInset">
+                                        <real key="value" value="8"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="rightInset">
+                                        <real key="value" value="8"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
                             </textField>
-                            <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="iPhone Landscape" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="smb-4j-gb9" customClass="MGTextField" customModule="MGCollectionView" customModuleProvider="target">
-                                <rect key="frame" x="127.5" y="66" width="120" height="30"/>
+                            <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="iPad Portrait" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="fph-en-23t">
+                                <rect key="frame" x="163" y="206" width="50" height="30"/>
                                 <nil key="textColor"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits" keyboardType="numberPad"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="boolean" keyPath="floatingPlaceholder" value="YES"/>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="leftInset">
+                                        <real key="value" value="8"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="rightInset">
+                                        <real key="value" value="8"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
                             </textField>
-                            <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="iPad Portrait" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="fph-en-23t" customClass="MGTextField" customModule="MGCollectionView" customModuleProvider="target">
-                                <rect key="frame" x="127.5" y="104" width="120" height="30"/>
+                            <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="iPad Landscape" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="4lc-mc-L6q">
+                                <rect key="frame" x="163" y="260" width="50" height="30"/>
                                 <nil key="textColor"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits" keyboardType="numberPad"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="boolean" keyPath="floatingPlaceholder" value="YES"/>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="leftInset">
+                                        <real key="value" value="8"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="rightInset">
+                                        <real key="value" value="8"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
                             </textField>
-                            <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="iPad Landscape" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="4lc-mc-L6q" customClass="MGTextField" customModule="MGCollectionView" customModuleProvider="target">
-                                <rect key="frame" x="127.5" y="142" width="120" height="30"/>
-                                <nil key="textColor"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                <textInputTraits key="textInputTraits" keyboardType="numberPad"/>
-                            </textField>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Number of row:" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="BrC-aJ-Wc9">
-                                <rect key="frame" x="8" y="28" width="111.5" height="17"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" textAlignment="right" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="BrC-aJ-Wc9">
+                                <rect key="frame" x="8" y="98" width="147" height="29"/>
+                                <string key="text">iPhone
+Portrait</string>
+                                <fontDescription key="fontDescription" type="system" pointSize="12"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" textAlignment="right" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="fAG-P4-XQz">
+                                <rect key="frame" x="8" y="152" width="147" height="29"/>
+                                <string key="text">iPhone
+Landscape</string>
+                                <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" textAlignment="right" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ZLW-dm-34T">
+                                <rect key="frame" x="8" y="206" width="147.5" height="29"/>
+                                <string key="text">iPad
+Portrait</string>
+                                <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" textAlignment="right" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Jks-zy-Y3y">
+                                <rect key="frame" x="8" y="260" width="147.5" height="29"/>
+                                <string key="text">iPad
+Landscape</string>
+                                <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Cells for row" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="MHW-bM-U67">
+                                <rect key="frame" x="8" y="72" width="359" height="18"/>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="iPhone Landscape" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="smb-4j-gb9">
+                                <rect key="frame" x="163" y="152" width="50" height="30"/>
+                                <nil key="textColor"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits" keyboardType="numberPad"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="boolean" keyPath="floatingPlaceholder" value="YES"/>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="leftInset">
+                                        <real key="value" value="8"/>
+                                    </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="rightInset">
+                                        <real key="value" value="8"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                            </textField>
                         </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
                             <constraint firstItem="fph-en-23t" firstAttribute="width" secondItem="Kg8-WH-TsI" secondAttribute="width" id="27x-f8-SmK"/>
-                            <constraint firstItem="BrC-aJ-Wc9" firstAttribute="top" secondItem="Kg8-WH-TsI" secondAttribute="top" id="3gc-ZI-bik"/>
+                            <constraint firstItem="MHW-bM-U67" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="8" id="2Jp-Xf-XJG"/>
+                            <constraint firstItem="fAG-P4-XQz" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="8" id="2PF-eX-z0L"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="MHW-bM-U67" secondAttribute="trailing" constant="8" id="3cb-RZ-W1Q"/>
+                            <constraint firstItem="fAG-P4-XQz" firstAttribute="top" secondItem="smb-4j-gb9" secondAttribute="top" id="82t-70-qzk"/>
+                            <constraint firstItem="4lc-mc-L6q" firstAttribute="leading" secondItem="Jks-zy-Y3y" secondAttribute="trailing" constant="8" id="DaR-3n-jr2"/>
                             <constraint firstItem="yA9-Fa-7gp" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="KPJ-dS-p5U"/>
                             <constraint firstItem="smb-4j-gb9" firstAttribute="width" secondItem="Kg8-WH-TsI" secondAttribute="width" id="NZB-E7-bTx"/>
-                            <constraint firstItem="fph-en-23t" firstAttribute="top" secondItem="smb-4j-gb9" secondAttribute="bottom" constant="8" id="Nwb-uo-rbk"/>
+                            <constraint firstItem="fph-en-23t" firstAttribute="top" secondItem="smb-4j-gb9" secondAttribute="bottom" constant="24" id="Nwb-uo-rbk"/>
                             <constraint firstItem="4lc-mc-L6q" firstAttribute="centerX" secondItem="Kg8-WH-TsI" secondAttribute="centerX" id="Otw-z1-nvO"/>
                             <constraint firstItem="fph-en-23t" firstAttribute="centerX" secondItem="Kg8-WH-TsI" secondAttribute="centerX" id="P6q-gv-Yb1"/>
-                            <constraint firstItem="smb-4j-gb9" firstAttribute="top" secondItem="Kg8-WH-TsI" secondAttribute="bottom" constant="8" id="PzY-SP-uwH"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="Kg8-WH-TsI" secondAttribute="trailing" constant="8" id="PfQ-a6-wNo"/>
+                            <constraint firstItem="smb-4j-gb9" firstAttribute="top" secondItem="Kg8-WH-TsI" secondAttribute="bottom" constant="24" id="PzY-SP-uwH"/>
+                            <constraint firstItem="BrC-aJ-Wc9" firstAttribute="top" secondItem="Kg8-WH-TsI" secondAttribute="top" id="QLY-yV-vqO"/>
+                            <constraint firstItem="ZLW-dm-34T" firstAttribute="top" secondItem="fph-en-23t" secondAttribute="top" id="SDH-kI-Z2F"/>
+                            <constraint firstItem="MHW-bM-U67" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="8" id="TS0-Co-NDf"/>
+                            <constraint firstItem="smb-4j-gb9" firstAttribute="leading" secondItem="fAG-P4-XQz" secondAttribute="trailing" constant="8" id="V5P-pn-bxd"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="yA9-Fa-7gp" secondAttribute="bottom" constant="30" id="X3t-3u-KeS"/>
+                            <constraint firstItem="fph-en-23t" firstAttribute="leading" secondItem="ZLW-dm-34T" secondAttribute="trailing" constant="8" id="YbG-tt-F6f"/>
+                            <constraint firstItem="Kg8-WH-TsI" firstAttribute="top" secondItem="MHW-bM-U67" secondAttribute="bottom" constant="8" id="avb-bz-Wfx"/>
                             <constraint firstItem="4lc-mc-L6q" firstAttribute="width" secondItem="Kg8-WH-TsI" secondAttribute="width" id="dZv-pa-Xe0"/>
                             <constraint firstItem="Kg8-WH-TsI" firstAttribute="centerX" secondItem="6Tk-OE-BBY" secondAttribute="centerX" id="fIT-3t-Ow3"/>
                             <constraint firstItem="BrC-aJ-Wc9" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="8" id="h3s-Iu-MGx"/>
-                            <constraint firstItem="Kg8-WH-TsI" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="8" id="tch-Zp-YRr"/>
-                            <constraint firstItem="4lc-mc-L6q" firstAttribute="top" secondItem="fph-en-23t" secondAttribute="bottom" constant="8" id="vMR-an-C5c"/>
+                            <constraint firstItem="Jks-zy-Y3y" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="8" id="icR-kt-1lx"/>
+                            <constraint firstItem="ZLW-dm-34T" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="8" id="luS-J5-yFb"/>
+                            <constraint firstItem="Jks-zy-Y3y" firstAttribute="top" secondItem="4lc-mc-L6q" secondAttribute="top" id="tlp-K7-e8b"/>
+                            <constraint firstItem="4lc-mc-L6q" firstAttribute="top" secondItem="fph-en-23t" secondAttribute="bottom" constant="24" id="vMR-an-C5c"/>
                             <constraint firstItem="smb-4j-gb9" firstAttribute="centerX" secondItem="Kg8-WH-TsI" secondAttribute="centerX" id="wKC-Y8-xJA"/>
                             <constraint firstItem="Kg8-WH-TsI" firstAttribute="leading" secondItem="BrC-aJ-Wc9" secondAttribute="trailing" constant="8" id="zrC-5J-OnT"/>
                         </constraints>
@@ -114,7 +195,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="136.80000000000001" y="133.5832083958021"/>
+            <point key="canvasLocation" x="136.5" y="133.5"/>
         </scene>
         <!--Collection View Controller-->
         <scene sceneID="g3a-ng-IOe">

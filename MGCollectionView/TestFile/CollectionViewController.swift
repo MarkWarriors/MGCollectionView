@@ -18,7 +18,7 @@ class CollectionViewController: ViewController, MGCollectionViewProtocol {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        for i in 0...40 {
+        for i in 0...140 {
             var item : [String] = []
             item.append(randomString(length: 8) + " \(i)")
             item.append(randomString(length: 8) + " \(i)")
@@ -44,21 +44,23 @@ class CollectionViewController: ViewController, MGCollectionViewProtocol {
         return cellMg
     }
     
-    func refreshControlTriggered(){
-        print("refreshControltriggered")
+    
+    func refreshControlStatus(animating: Bool) {
+        print("Collection view refreshControl is animating? \(animating)")
     }
     
     
-    func requestDataForPage(page: Int) -> [Any] {
-        print("requestpage \(page)")
+    func requestDataForPage(page: Int, valuesCallback: ([Any]?) -> ()) {
+        print("Collection view request page \(page)")
         let itemPerPage : Int = 15
-        let endIndex : Int = min((itemPerPage * page) + itemPerPage, testarray.count - 1)
+        let startIndex : Int = (itemPerPage * page)
+        let endIndex : Int = min(startIndex + itemPerPage - 1, testarray.count - 1)
         var array : [[String]] = []
-        for index in 0...endIndex-1 {
+        for index in startIndex...endIndex-1 {
             array.append(testarray[index])
         }
-        print("returning \(array.count)")
-        return array
+        print("Collection view is getting  \(array.count > 0 ? array.count > 1 ? "\(array.count) elements" : "\(array.count) element " : "no elements")")
+        valuesCallback(array)
     }
     
 

@@ -13,7 +13,7 @@ import UIKit
 @objc protocol MGCollectionViewProtocol {
     func itemSelected(item: Any)
     func displayItem(_ item: Any, inCell cell: UICollectionViewCell) -> UICollectionViewCell
-    func requestDataForPage(page: Int) -> [Any]
+    func requestDataForPage(page: Int, valuesCallback: ([Any]?)->())
     @objc optional func refreshControlStatus(animating: Bool)
 }
 
@@ -91,25 +91,26 @@ import UIKit
     }
     
     func askItemsForPage(page: Int){
-        let newValues = protocolDelegate?.requestDataForPage(page: currentPage)
-        if newValues != nil && self.items.count < newValues!.count {
-            self.items = newValues!
-            reloadData()
-            performBatchUpdates({
-            }, completion: { (completed) in
-                if self.mgRefreshControl.isRefreshing {
-                    self.mgRefreshControl.endRefreshing()
-                    if self.protocolDelegate?.refreshControlStatus != nil {
-                        self.protocolDelegate?.refreshControlStatus!(animating: false)
+        protocolDelegate?.requestDataForPage(page: currentPage, valuesCallback: { (newValues) in
+            if newValues != nil && newValues!.count > 0 {
+                self.items.append(contentsOf: newValues!)
+                reloadData()
+                performBatchUpdates({
+                }, completion: { (completed) in
+                    if self.mgRefreshControl.isRefreshing {
+                        self.mgRefreshControl.endRefreshing()
+                        if self.protocolDelegate?.refreshControlStatus != nil {
+                            self.protocolDelegate?.refreshControlStatus!(animating: false)
+                        }
                     }
-                }
+                    self.isLoading = false
+                })
+            }
+            else {
+                self.endInifiniteScroll = true
                 self.isLoading = false
-            })
-        }
-        else {
-            endInifiniteScroll = true
-            self.isLoading = false
-        }
+            }
+        })
     }
     
     internal func scrollViewDidScroll(_ scrollView: UIScrollView) {
