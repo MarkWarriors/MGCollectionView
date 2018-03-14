@@ -15,21 +15,19 @@ import UIKit
     func displayItem(_ item: Any, inCell cell: UICollectionViewCell) -> UICollectionViewCell
     func requestDataForPage(page: Int, valuesCallback: ([Any]?)->())
     @objc optional func refreshControlStatus(animating: Bool)
+    
 }
 
 @IBDesignable class MGCollectionView : UICollectionView, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout, UICollectionViewDataSource {
-    
     public typealias IntForDeviceAndOrientation = (iphonePortrait: Int, iphoneLandscape: Int, ipadPortrait: Int, ipadLandscape: Int)
-    
-    //    var emptyCollectionText : String? = nil
-    //    var emptyCollectionView : UIView? = nil
+
     var cellsForRow : IntForDeviceAndOrientation = (1, 1, 1, 1)
     var cellsSpacing : (left: CGFloat, top: CGFloat, right: CGFloat, bottom: CGFloat) = (0, 0, 0, 0)
     var cellProportion : CGSize = CGSize.init(width: 1, height: 1)
     var pullToRefresh : Bool = false
     var useInfiniteScroll : Bool = false
     
-    var items : [Any] = []
+    public private(set) var items : [Any] = []
     private var currentPage : Int = 0
     var cellNibName : String? = nil
     var cellIdentifier : String? = nil
@@ -37,7 +35,7 @@ import UIKit
     private var isLoading : Bool = false
     private var endInifiniteScroll = false
     
-    var mgRefreshControl : UIRefreshControl = UIRefreshControl()
+    var cvRefreshControl : UIRefreshControl = UIRefreshControl()
     
     var protocolDelegate : MGCollectionViewProtocol? = nil
     
@@ -72,15 +70,15 @@ import UIKit
         }
         
         if pullToRefresh {
-            mgRefreshControl.addTarget(self, action: #selector(refreshTriggered), for: .valueChanged)
-            self.addSubview(mgRefreshControl)
+            cvRefreshControl.addTarget(self, action: #selector(refreshTriggered), for: .valueChanged)
+            self.addSubview(cvRefreshControl)
         }
         
         askItemsForPage(page: currentPage)
     }
     
     @objc
-    private func refreshTriggered(){
+    private func refreshTriggered() {
         endInifiniteScroll = false
         isLoading = true
         currentPage = 0
@@ -90,15 +88,15 @@ import UIKit
         askItemsForPage(page: currentPage)
     }
     
-    func askItemsForPage(page: Int){
+    func askItemsForPage(page: Int) {
         protocolDelegate?.requestDataForPage(page: currentPage, valuesCallback: { (newValues) in
             if newValues != nil && newValues!.count > 0 {
                 self.items.append(contentsOf: newValues!)
                 reloadData()
                 performBatchUpdates({
                 }, completion: { (completed) in
-                    if self.mgRefreshControl.isRefreshing {
-                        self.mgRefreshControl.endRefreshing()
+                    if self.cvRefreshControl.isRefreshing {
+                        self.cvRefreshControl.endRefreshing()
                         if self.protocolDelegate?.refreshControlStatus != nil {
                             self.protocolDelegate?.refreshControlStatus!(animating: false)
                         }

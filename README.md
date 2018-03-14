@@ -7,10 +7,10 @@ Copy the MGCollectionView.swift in your project, and set it as class of an UICol
 
 In the ViewController add the MGCollectionViewProtocol
 #### The methods of the protocol are:
-    func itemSelected(item: Any)
-    func displayItem(_ item: Any, inCell cell: UICollectionViewCell) -> UICollectionViewCell
-    func requestDataForPage(page: Int) -> [Any]
-    func refreshControlStatus(animating: Bool) // OPTIONAL!!
+    func itemSelected(item: Any) // REQUIRED - called when an item of the collection is selected
+    func displayItem(_ item: Any, inCell cell: UICollectionViewCell) -> UICollectionViewCell // REQUIRED - called to customize the cells
+    func requestDataForPage(page: Int, valuesCallback: ([Any]?)->()) // REQUIRED - request new item to append at the collection view data source
+    func refreshControlStatus(animating: Bool) // OPTIONAL - Used to get the notification that the refreshControl startAnimating or stopAnimating
    
 And also in the ViewController set the paramters that you want
 #### Parameters:

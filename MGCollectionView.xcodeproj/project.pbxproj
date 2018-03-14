@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		90B8C9FE205989F500454497 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 90B8C9FD205989F500454497 /* README.md */; };
 		90B976DB20567174000795D2 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90B976D120567174000795D2 /* ViewController.swift */; };
 		90B976DC20567174000795D2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 90B976D220567174000795D2 /* Assets.xcassets */; };
 		90B976DD20567174000795D2 /* MGCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90B976D320567174000795D2 /* MGCollectionViewCell.swift */; };
@@ -20,6 +21,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		90B8C9FD205989F500454497 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = SOURCE_ROOT; };
 		90B976BB20567143000795D2 /* MGCollectionView.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MGCollectionView.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		90B976CA20567144000795D2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		90B976D120567174000795D2 /* ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -64,6 +66,7 @@
 		90B976BD20567143000795D2 /* MGCollectionView */ = {
 			isa = PBXGroup;
 			children = (
+				90B8C9FD205989F500454497 /* README.md */,
 				90B976D020567174000795D2 /* TestFile */,
 				90B976CA20567144000795D2 /* Info.plist */,
 				90B976E32056717B000795D2 /* MGCollectionView.swift */,
@@ -148,6 +151,7 @@
 			files = (
 				90B976DF20567174000795D2 /* Main.storyboard in Resources */,
 				90B976E120567174000795D2 /* MGCollectionViewCell.xib in Resources */,
+				90B8C9FE205989F500454497 /* README.md in Resources */,
 				90B976DE20567174000795D2 /* LaunchScreen.storyboard in Resources */,
 				90B976DC20567174000795D2 /* Assets.xcassets in Resources */,
 			);
