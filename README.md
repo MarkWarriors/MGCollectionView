@@ -24,6 +24,10 @@ And also in the ViewController set the paramters that you want
     collectionView.cellsSpacing // (left: CGFloat, top: CGFloat, right: CGFloat, bottom: CGFloat) - spacing of the cell @ left, top, right, bottom
     collectionView.cellsForRow // (iphonePortrait: Int, iphoneLandscape: Int, ipadPortrait: Int, ipadLandscape: Int) - number of cell for row for the different device type and orientation
 
-#### SCREENSHOTS:
+#### Screenshots:
+Same collection, same code, different orientation and device
+##### iPhone (portrait - landscape)
+<img src="https://raw.githubusercontent.com/MarkWarriors/MGCollectionView/master/iphone_port.png" width="200"> <img src="https://raw.githubusercontent.com/MarkWarriors/MGCollectionView/master/iphone_land.png" height="200"> 
 
-<img src="https://raw.githubusercontent.com/MarkWarriors/MGCollectionView/master/iphone_port.png" width="200"> <img src="https://raw.githubusercontent.com/MarkWarriors/MGCollectionView/master/iphone_land.png" width="200"> <img src="https://raw.githubusercontent.com/MarkWarriors/MGCollectionView/master/ipad_port.png" width="200"> <img src="https://raw.githubusercontent.com/MarkWarriors/MGCollectionView/master/ipad_land.png" width="200">
+##### iPad (portrait - landscape)
+<img src="https://raw.githubusercontent.com/MarkWarriors/MGCollectionView/master/ipad_port.png" width="200"> <img src="https://raw.githubusercontent.com/MarkWarriors/MGCollectionView/master/ipad_land.png" height="200">
