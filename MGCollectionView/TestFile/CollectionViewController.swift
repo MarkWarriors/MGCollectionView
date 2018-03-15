@@ -10,9 +10,15 @@ import UIKit
 
 class CollectionViewController: ViewController, MGCollectionViewProtocol {
     
-    public var cellForRow : (iphonePortrait: Int, iphoneLandscape: Int, ipadPortrait: Int, ipadLandscape: Int)?
+    public var cellForRow : (iphonePortrait: Int, iphoneLandscape: Int, ipadPortrait: Int, ipadLandscape: Int) = (1, 3, 3, 4)
+    public var cellSpacing : (left: CGFloat, top: CGFloat, right: CGFloat, bottom: CGFloat) = (1, 1, 1, 1)
+    public var cellProportion : CGSize = CGSize.init(width: 1, height: 1)
+    public var usePullToRefresh : Bool = false
+    public var useInfiniteScroll : Bool = false
+    public var testWithRequest : Bool = false
     
-    var testarray : [[String]] = []
+    private var testarray : [[String]] = []
+    private let spacexLaunchUrl : URL = URL.init(string: "https://api.spacexdata.com/v2/launches/")!
 
     @IBOutlet weak var collectionView: MGCollectionView!
     
@@ -25,13 +31,13 @@ class CollectionViewController: ViewController, MGCollectionViewProtocol {
             testarray.append(item)
         }
         collectionView.protocolDelegate = self
-        collectionView.pullToRefresh = true
-        collectionView.useInfiniteScroll = true
+        collectionView.pullToRefresh = usePullToRefresh
+        collectionView.useInfiniteScroll = useInfiniteScroll
         collectionView.cellIdentifier = MGCollectionViewCell.identifier
-        collectionView.cellNibName = MGCollectionViewCell.identifier
-        collectionView.cellProportion = CGSize.init(width: 2, height: 1)
-        collectionView.cellsSpacing = (1, 1, 1, 1)
-        collectionView.cellsForRow = cellForRow != nil ? cellForRow! : (iphonePortrait: 1, iphoneLandscape: 2, ipadPortrait: 3, ipadLandscape: 6)
+        collectionView.cellNib = UINib.init(nibName: MGCollectionViewCell.identifier, bundle: nil)
+        collectionView.cellProportion = cellProportion
+        collectionView.cellsSpacing = cellSpacing
+        collectionView.cellsForRow = cellForRow
     }
 
     func itemSelected(item: Any) {
@@ -50,17 +56,59 @@ class CollectionViewController: ViewController, MGCollectionViewProtocol {
     }
     
     
-    func requestDataForPage(page: Int, valuesCallback: ([Any]?) -> ()) {
-        print("Collection view request page \(page)")
+    func requestDataForPage(page: Int, valuesCallback: @escaping ([Any]?) -> ()) {
         let itemPerPage : Int = 15
-        let startIndex : Int = (itemPerPage * page)
-        let endIndex : Int = min(startIndex + itemPerPage - 1, testarray.count - 1)
-        var array : [[String]] = []
-        for index in startIndex...endIndex-1 {
-            array.append(testarray[index])
+        if testWithRequest {
+            print("Collection view request page \(page) - Test with web request")
+            DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2), execute: { // Just for show the loader
+                var request = URLRequest(url: self.spacexLaunchUrl)
+                request.httpMethod = "GET"
+                
+                let task = URLSession.shared.dataTask(with: request) { data, response, error in
+                    guard let data = data, error == nil else {
+                        print(error?.localizedDescription ?? "No data")
+                        return
+                    }
+                    var flightArray : [[String]] = []
+                    let responseJSON = try? JSONSerialization.jsonObject(with: data, options: [])
+                    if let responseJSON = responseJSON as? [[String: Any]] {
+                        let startIndex : Int = min((itemPerPage * page), responseJSON.count)
+                        let endIndex : Int = min(startIndex + itemPerPage - 1, responseJSON.count - 1)
+                        if startIndex < endIndex {
+                            let arraySlice = responseJSON[startIndex...endIndex]
+                            for flight in arraySlice {
+                                if let rocket = flight["rocket"] as? [String:Any] {
+                                    var item : [String] = []
+                                    let flightNumber = flight["flight_number"] as? Int ?? 0
+                                    let rocketName = rocket["rocket_name"] as? String ?? ""
+                                    let date : String = flight["launch_year"] as? String ?? ""
+                                    let details = flight["details"]
+                                    item.append("Flight \(flightNumber): \(rocketName) (\(date))")
+                                    item.append("\(details ?? "")")
+                                    flightArray.append(item)
+                                }
+                            }
+                        }
+                        valuesCallback(flightArray)
+                    }
+                }
+                
+                task.resume()
+            })
         }
-        print("Collection view is getting  \(array.count > 0 ? array.count > 1 ? "\(array.count) elements" : "\(array.count) element " : "no elements")")
-        valuesCallback(array)
+        else {
+            print("Collection view request page \(page)")
+            let startIndex : Int = min((itemPerPage * page), testarray.count)
+            let endIndex : Int = min(startIndex + itemPerPage - 1, testarray.count - 1)
+            var array : [[String]] = []
+            if startIndex < endIndex{
+                for index in startIndex...endIndex-1 {
+                    array.append(testarray[index])
+                }
+            }
+            print("Collection view is getting  \(array.count > 0 ? array.count > 1 ? "\(array.count) elements" : "\(array.count) element " : "no elements")")
+            valuesCallback(array)
+        }
     }
     
 
@@ -80,3 +128,5 @@ class CollectionViewController: ViewController, MGCollectionViewProtocol {
         return randomString
     }
 }
+
+
