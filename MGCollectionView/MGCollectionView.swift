@@ -20,11 +20,17 @@ import UIKit
 
 
 @IBDesignable class MGCollectionView : UICollectionView, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout, UICollectionViewDataSource {
-    public typealias IntForDeviceAndOrientation = (iphonePortrait: Int, iphoneLandscape: Int, ipadPortrait: Int, ipadLandscape: Int)
-
-    var cellsForRow : IntForDeviceAndOrientation = (1, 1, 1, 1)
+    public typealias CellInARowForDeviceAndOrientation = (iphonePortrait: Int, iphoneLandscape: Int, ipadPortrait: Int, ipadLandscape: Int)
+    
+    public enum CellLayoutTypeEnum {
+        case fixedWidth
+        case fixedNumberForRow
+    }
+    
+    public typealias CellLayoutType = CellLayoutTypeEnum
+    
     var cellsSpacing : (left: CGFloat, top: CGFloat, right: CGFloat, bottom: CGFloat) = (0, 0, 0, 0)
-    var cellProportion : CGSize = CGSize.init(width: 1, height: 1)
+    var cellProportion : CGSize = CGSize.init(width: 0, height: 0)
     var pullToRefresh : Bool = false
     var useInfiniteScroll : Bool = false
     var cellNib : UINib? = nil
@@ -34,6 +40,9 @@ import UIKit
     
     public private(set) var items : [Any] = []
     
+    private var cellLayoutType : CellLayoutType?
+    private var cellsWidth : CGFloat = 0
+    private var cellsForRow : CellInARowForDeviceAndOrientation = (1, 1, 1, 1)
     private var currentPage : Int = 0
     private var isLoading : Bool = false
     private var endInifiniteScroll = false
@@ -45,20 +54,40 @@ import UIKit
     
     override func draw(_ rect: CGRect) {
         super.draw(rect)
+    }
+    
+    func initWithCellFixedWidth(_ width: CGFloat){
+        cellLayoutType = .fixedWidth
+        self.cellsWidth = width
         initCollectionView()
     }
-
+    
+    func initWithCellFixedNumberForRow(_ cellsForRow: CellInARowForDeviceAndOrientation){
+        self.cellLayoutType = .fixedNumberForRow
+        self.cellsForRow = cellsForRow
+        initCollectionView()
+    }
+    
     
     private func initCollectionView() {
         self.delegate = self
         self.dataSource = self
         
+        if cellLayoutType == nil {
+            print("#MGCollectionView: No layout type provided")
+            return
+        }
+        
+        if cellLayoutType == .fixedWidth && cellsWidth == 0 {
+            assertionFailure("#MGCollectionView: The cell width is 0.")
+        }
+        
         if self.cellProportion.width == 0 || self.cellProportion.height == 0 {
-            assertionFailure("#MGCollectionView: cell proportion have one size equal to 0")
+            assertionFailure("#MGCollectionView: cell proportion with a dimension equal to 0.")
         }
         
         if cellIdentifier == nil {
-            assertionFailure("#MGCollectionView: cellNibName or cellClass required")
+            assertionFailure("#MGCollectionView: cellIdentifier required")
         }
         
         if cellNib != nil {
@@ -68,7 +97,7 @@ import UIKit
             self.register(cellClass, forCellWithReuseIdentifier: cellIdentifier!)
         }
         else {
-            assertionFailure("#MGCollectionView: cellNibName or cellClass required")
+            assertionFailure("#MGCollectionView: cellNib or cellClass required")
         }
         
         if pullToRefresh {
@@ -142,7 +171,7 @@ import UIKit
             }
         }
     }
-
+    
     internal func numberOfSections(in collectionView: UICollectionView) -> Int {
         return 1
     }
@@ -167,27 +196,35 @@ import UIKit
     }
     
     internal func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        var cfr : Int = 1
-        
-        if UIDevice.current.userInterfaceIdiom == .pad {
-            if UIApplication.shared.statusBarOrientation == UIInterfaceOrientation.portrait || UIApplication.shared.statusBarOrientation == UIInterfaceOrientation.portraitUpsideDown {
-                cfr = cellsForRow.ipadPortrait
+        var width : CGFloat = 0
+        var height : CGFloat = 0
+        if cellLayoutType == .fixedWidth {
+            width = cellsWidth
+            height = CGFloat(width * cellProportion.height / cellProportion.width)
+        }
+        else if cellLayoutType == .fixedNumberForRow {
+            var cfr : Int = 1
+            
+            if UIDevice.current.userInterfaceIdiom == .pad {
+                if UIApplication.shared.statusBarOrientation == UIInterfaceOrientation.portrait || UIApplication.shared.statusBarOrientation == UIInterfaceOrientation.portraitUpsideDown {
+                    cfr = cellsForRow.ipadPortrait
+                }
+                else {
+                    cfr = cellsForRow.ipadLandscape
+                }
             }
             else {
-                cfr = cellsForRow.ipadLandscape
+                if UIApplication.shared.statusBarOrientation == UIInterfaceOrientation.portrait || UIApplication.shared.statusBarOrientation == UIInterfaceOrientation.portraitUpsideDown {
+                    cfr = cellsForRow.iphonePortrait
+                }
+                else {
+                    cfr = cellsForRow.iphoneLandscape
+                }
             }
+            
+            width = (self.frame.size.width / CGFloat(cfr)) - CGFloat(cellsSpacing.left + cellsSpacing.right)
+            height = CGFloat(width * cellProportion.height / cellProportion.width) - CGFloat(cellsSpacing.top + cellsSpacing.bottom)
         }
-        else {
-            if UIApplication.shared.statusBarOrientation == UIInterfaceOrientation.portrait || UIApplication.shared.statusBarOrientation == UIInterfaceOrientation.portraitUpsideDown {
-                cfr = cellsForRow.iphonePortrait
-            }
-            else {
-                cfr = cellsForRow.iphoneLandscape
-            }
-        }
-        
-        let width = (UIScreen.main.bounds.width / CGFloat(cfr)) - CGFloat(cellsSpacing.left + cellsSpacing.right)
-        let height = CGFloat(width * cellProportion.height / cellProportion.width) - CGFloat(cellsSpacing.top + cellsSpacing.bottom)
         return CGSize.init(width: width, height: height)
     }
     
@@ -215,13 +252,13 @@ import UIKit
         }
         return UICollectionReusableView.init(frame: CGRect.zero)
     }
-
-
+    
+    
 }
 
 class MGCollectionViewFooter : UICollectionReusableView {
     let ref = UIActivityIndicatorView.init(frame: CGRect.init(x: 0, y: 0, width: 35, height: 35))
-
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         self.translatesAutoresizingMaskIntoConstraints = false
@@ -237,7 +274,7 @@ class MGCollectionViewFooter : UICollectionReusableView {
         self.bringSubview(toFront: ref)
     }
     
-
+    
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
     }

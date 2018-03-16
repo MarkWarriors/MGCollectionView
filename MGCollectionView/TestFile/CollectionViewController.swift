@@ -37,7 +37,7 @@ class CollectionViewController: ViewController, MGCollectionViewProtocol {
         collectionView.cellNib = UINib.init(nibName: MGCollectionViewCell.identifier, bundle: nil)
         collectionView.cellProportion = cellProportion
         collectionView.cellsSpacing = cellSpacing
-        collectionView.cellsForRow = cellForRow
+        collectionView.initWithCellFixedNumberForRow(cellForRow)
     }
 
     func itemSelected(item: Any) {

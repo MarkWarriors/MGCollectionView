@@ -23,6 +23,9 @@ And also in the ViewController set the paramters that you want
     collectionView.cellProportion // CGSize - the proportion (height and with) of every cell
     collectionView.cellsSpacing // (left: CGFloat, top: CGFloat, right: CGFloat, bottom: CGFloat) - spacing of the cell @ left, top, right, bottom
     collectionView.cellsForRow // (iphonePortrait: Int, iphoneLandscape: Int, ipadPortrait: Int, ipadLandscape: Int) - number of cell for row for the different device type and orientation
+    
+#### Init the CollectionView:
+    collectionView.initWithCellFixedNumberForRow( CellForRow ) // To setup the collection view, after set all the properties, just call this method. REQUIRED
 
 #### Screenshots:
 Same collection, same code, different orientation and device
