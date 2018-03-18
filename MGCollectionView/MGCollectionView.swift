@@ -11,26 +11,27 @@ import UIKit
 
 
 @objc protocol MGCollectionViewProtocol {
-    func itemSelected(item: Any)
-    func displayItem(_ item: Any, inCell cell: UICollectionViewCell) -> UICollectionViewCell
-    func requestDataForPage(page: Int, valuesCallback: @escaping ([Any]?)->())
+    @objc func itemSelected(item: Any)
+    @objc func displayItem(_ item: Any, inCell cell: UICollectionViewCell) -> UICollectionViewCell
+    @objc func requestDataForPage(page: Int, valuesCallback: @escaping ([Any]?)->())
     @objc optional func refreshControlStatus(animating: Bool)
-    
+    @objc optional func collectionViewEndUpdating(totalElements: Int)
 }
 
 
 @IBDesignable class MGCollectionView : UICollectionView, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout, UICollectionViewDataSource {
+    
     public typealias CellInARowForDeviceAndOrientation = (iphonePortrait: Int, iphoneLandscape: Int, ipadPortrait: Int, ipadLandscape: Int)
+    public typealias CellProportions = (width: CGFloat, height: CGFloat)
+    public typealias CellSpacing = (top: CGFloat, left: CGFloat, bottom: CGFloat, right: CGFloat)
     
     public enum CellLayoutTypeEnum {
-        case fixedWidth
+        case fixedWidthAndHeight
         case fixedNumberForRow
     }
-    
     public typealias CellLayoutType = CellLayoutTypeEnum
     
-    var cellsSpacing : (left: CGFloat, top: CGFloat, right: CGFloat, bottom: CGFloat) = (0, 0, 0, 0)
-    var cellProportion : CGSize = CGSize.init(width: 0, height: 0)
+    
     var pullToRefresh : Bool = false
     var useInfiniteScroll : Bool = false
     var cellNib : UINib? = nil
@@ -40,15 +41,18 @@ import UIKit
     
     public private(set) var items : [Any] = []
     
+    private var cellProportions : CellProportions = (width: 0, height: 0)
+    private var cellSpacing : CellSpacing  = (top: 0, left: 0, bottom: 0, right: 0)
     private var cellLayoutType : CellLayoutType?
     private var cellsWidth : CGFloat = 0
+    private var cellsHeight : CGFloat = 0
     private var cellsForRow : CellInARowForDeviceAndOrientation = (1, 1, 1, 1)
     private var currentPage : Int = 0
     private var isLoading : Bool = false
     private var endInifiniteScroll = false
     private var footerHeight : CGFloat = 0.0
     
-    var cvRefreshControl : UIRefreshControl = UIRefreshControl()
+    public private(set)var cvRefreshControl : UIRefreshControl = UIRefreshControl()
     
     var protocolDelegate : MGCollectionViewProtocol? = nil
     
@@ -56,18 +60,21 @@ import UIKit
         super.draw(rect)
     }
     
-    func initWithCellFixedWidth(_ width: CGFloat){
-        cellLayoutType = .fixedWidth
+    func initWithCellFixed(width: CGFloat, height: CGFloat){
+        cellLayoutType = .fixedWidthAndHeight
         self.cellsWidth = width
+        self.cellsHeight = height
+        self.cellProportions = (width: width, height: height)
         initCollectionView()
     }
     
-    func initWithCellFixedNumberForRow(_ cellsForRow: CellInARowForDeviceAndOrientation){
+    func initWithCellFixedNumberOf(_ cellsForRow: CellInARowForDeviceAndOrientation, cellProportions proportions: CellProportions, andSpacing spacing: CellSpacing){
         self.cellLayoutType = .fixedNumberForRow
         self.cellsForRow = cellsForRow
+        self.cellProportions = proportions
+        self.cellSpacing = spacing
         initCollectionView()
     }
-    
     
     private func initCollectionView() {
         self.delegate = self
@@ -78,11 +85,17 @@ import UIKit
             return
         }
         
-        if cellLayoutType == .fixedWidth && cellsWidth == 0 {
-            assertionFailure("#MGCollectionView: The cell width is 0.")
+        if cellLayoutType == .fixedWidthAndHeight {
+            if cellsWidth == 0 {
+                assertionFailure("#MGCollectionView: The cell width is 0.")
+            }
+            if cellsWidth > self.frame.size.width {
+                print("#MGCollectionView: The cell width is greater then the Collection view. Change it to the width of the Collection View.")
+            }
         }
         
-        if self.cellProportion.width == 0 || self.cellProportion.height == 0 {
+        
+        if self.cellProportions.width == 0 || self.cellProportions.height == 0 {
             assertionFailure("#MGCollectionView: cell proportion with a dimension equal to 0.")
         }
         
@@ -136,6 +149,9 @@ import UIKit
                             self.cvRefreshControl.endRefreshing()
                             if self.protocolDelegate?.refreshControlStatus != nil {
                                 self.protocolDelegate?.refreshControlStatus!(animating: false)
+                            }
+                            if self.protocolDelegate?.collectionViewEndUpdating != nil {
+                                self.protocolDelegate?.collectionViewEndUpdating!(totalElements: self.items.count)
                             }
                         }
                         self.isLoading = false
@@ -198,9 +214,12 @@ import UIKit
     internal func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         var width : CGFloat = 0
         var height : CGFloat = 0
-        if cellLayoutType == .fixedWidth {
+        if cellLayoutType == .fixedWidthAndHeight {
+            if cellsWidth > self.frame.size.width{
+                cellsWidth = self.frame.size.width
+            }
             width = cellsWidth
-            height = CGFloat(width * cellProportion.height / cellProportion.width)
+            height = cellsHeight
         }
         else if cellLayoutType == .fixedNumberForRow {
             var cfr : Int = 1
@@ -222,14 +241,23 @@ import UIKit
                 }
             }
             
-            width = (self.frame.size.width / CGFloat(cfr)) - CGFloat(cellsSpacing.left + cellsSpacing.right)
-            height = CGFloat(width * cellProportion.height / cellProportion.width) - CGFloat(cellsSpacing.top + cellsSpacing.bottom)
+            width = (self.frame.size.width / CGFloat(cfr)) - CGFloat(cellSpacing.left + cellSpacing.right)
+            height = CGFloat(width * cellProportions.height / cellProportions.width) - CGFloat(cellSpacing.top + cellSpacing.bottom)
         }
         return CGSize.init(width: width, height: height)
     }
     
     internal func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
-        return UIEdgeInsetsMake(cellsSpacing.top, cellsSpacing.left, cellsSpacing.bottom, cellsSpacing.right)
+        if cellLayoutType == .fixedWidthAndHeight {
+            let width = cellsWidth
+            let estimatedCellsForRow : Int = Int(floor(self.frame.size.width / width))
+            let estimatedSpacing : CGFloat = (self.frame.size.width - (CGFloat(estimatedCellsForRow) * width)) / CGFloat(estimatedCellsForRow * 2)
+            return UIEdgeInsetsMake(estimatedSpacing, estimatedSpacing, estimatedSpacing, estimatedSpacing)
+        }
+        else if cellLayoutType == .fixedNumberForRow {
+            return UIEdgeInsetsMake(cellSpacing.top, cellSpacing.left, cellSpacing.bottom, cellSpacing.right)
+        }
+        return UIEdgeInsetsMake(0, 0, 0, 0)
     }
     
     internal func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {

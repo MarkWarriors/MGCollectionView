@@ -68,8 +68,8 @@
 			children = (
 				90B8C9FD205989F500454497 /* README.md */,
 				90B976D020567174000795D2 /* TestFile */,
-				90B976CA20567144000795D2 /* Info.plist */,
 				90B976E32056717B000795D2 /* MGCollectionView.swift */,
+				90B976CA20567144000795D2 /* Info.plist */,
 			);
 			path = MGCollectionView;
 			sourceTree = "<group>";

@@ -11,6 +11,7 @@ In the ViewController add the MGCollectionViewProtocol
     func displayItem(_ item: Any, inCell cell: UICollectionViewCell) -> UICollectionViewCell // REQUIRED - called to customize the cells
     func requestDataForPage(page: Int, valuesCallback: @escaping ([Any]?)->()) // REQUIRED - request new item to append at the collection view data source
     func refreshControlStatus(animating: Bool) // OPTIONAL - Used to get the notification that the refreshControl startAnimating or stopAnimating
+    func collectionViewEndUpdating(totalElements: Int) // OPTIONAL - Used to get the notification that the CollectionView end the insert update and give you the total count of the items in the collection
    
 And also in the ViewController set the paramters that you want
 #### Parameters:
@@ -20,12 +21,10 @@ And also in the ViewController set the paramters that you want
     collectionView.cellIdentifier // String - identifier for the reusable cell REQUIRED
     collectionView.cellNib // UINib - Nib of your cell. REQUIRED if not setted cellClass
     collectionView.cellClass // String - name of your cell class. REQUIRED if not setted cellNib
-    collectionView.cellProportion // CGSize - the proportion (height and with) of every cell
-    collectionView.cellsSpacing // (left: CGFloat, top: CGFloat, right: CGFloat, bottom: CGFloat) - spacing of the cell @ left, top, right, bottom
-    collectionView.cellsForRow // (iphonePortrait: Int, iphoneLandscape: Int, ipadPortrait: Int, ipadLandscape: Int) - number of cell for row for the different device type and orientation
     
 #### Init the CollectionView:
-    collectionView.initWithCellFixedNumberForRow( CellForRow ) // To setup the collection view, after set all the properties, just call this method. REQUIRED
+    collectionView.initWithCellFixed(width: CGFloat, height: CGFloat) // Setup the CollectionView with fixed width and height for cells
+    collectionView.initWithCellFixedNumberOf(cellForRow, cellProportions: (CGFloat, CGFloat), andSpacing: (CGFloat, CGFloat, CGFloat, CGFloat)) // Setup the CollectionView with fixed numbver of rows
 
 #### Screenshots:
 Same collection, same code, different orientation and device

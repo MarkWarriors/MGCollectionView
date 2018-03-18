@@ -10,6 +10,10 @@ import UIKit
 
 class ViewController: UIViewController, UITextFieldDelegate {
 
+    @IBOutlet weak var cellsForRowHeightConstraint: NSLayoutConstraint!
+    @IBOutlet weak var fixedDimensionsHeightConstraint: NSLayoutConstraint!
+    @IBOutlet weak var fixedWidth: UITextField!
+    @IBOutlet weak var fixedHeight: UITextField!
     @IBOutlet weak var iphonePortraitRowNumberLbl: UITextField!
     @IBOutlet weak var iphoneLandscapeRowNumberLbl: UITextField!
     @IBOutlet weak var ipadPortraitRowNumberLbl: UITextField!
@@ -23,14 +27,34 @@ class ViewController: UIViewController, UITextFieldDelegate {
     @IBOutlet weak var pullToRefreshSwitch: UISwitch!
     @IBOutlet weak var infiniteScrollSwitch: UISwitch!
     @IBOutlet weak var dataFromInternetSwitch: UISwitch!
+    @IBOutlet weak var modeSwitch: UISwitch!
+    
     
     private var currentEditingTF : UITextField?
     
     override func viewDidLoad() {
         super.viewDidLoad()
         closeKeyboardIfViewIsTapped(view: self.view)
+        modeSwitchChange(self)
     }
 
+    @IBAction func modeSwitchChange(_ sender: Any) {
+        if modeSwitch != nil {
+            if modeSwitch.isOn {
+                fixedDimensionsHeightConstraint.constant = 0
+                cellsForRowHeightConstraint.constant = 304
+            }
+            else {
+                fixedDimensionsHeightConstraint.constant = 64
+                cellsForRowHeightConstraint.constant = 0
+            }
+            
+            UIView.animate(withDuration: 0.2) {
+                self.view.layoutSubviews()
+            }
+        }
+    }
+    
     public func closeKeyboardIfViewIsTapped(view: UIView) {
         view.addGestureRecognizer(UITapGestureRecognizer.init(target: self, action: #selector(self.dismissKeyboard)))
     }
@@ -51,9 +75,9 @@ class ViewController: UIViewController, UITextFieldDelegate {
                 (ipadLandscapeRowNumberLbl.text! as NSString).integerValue
             )
             
-            dst.cellProportion = CGSize.init(
-                width: (cellProportionWidth.text! as NSString).integerValue,
-                height: (cellProportionHeight.text! as NSString).integerValue
+            dst.cellProportion = (
+                width: CGFloat((cellProportionWidth.text! as NSString).floatValue),
+                height: CGFloat((cellProportionHeight.text! as NSString).floatValue)
             )
             
             dst.cellSpacing = (
@@ -63,6 +87,12 @@ class ViewController: UIViewController, UITextFieldDelegate {
                 bottom: CGFloat((cellSpacingBottom.text! as NSString).floatValue)
             )
             
+            dst.fixedDimensions = CGSize.init(
+                width: CGFloat((fixedWidth.text! as NSString).floatValue),
+                height: CGFloat((fixedHeight.text! as NSString).floatValue)
+            )
+            
+            dst.useFixedDimesnions = !modeSwitch.isOn
             dst.usePullToRefresh = pullToRefreshSwitch.isOn
             dst.useInfiniteScroll = infiniteScrollSwitch.isOn
             dst.testWithRequest = dataFromInternetSwitch.isOn
@@ -70,7 +100,13 @@ class ViewController: UIViewController, UITextFieldDelegate {
     }
     
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
-        let maxLength = 2
+        var maxLength : Int = 0
+        if textField == self.fixedWidth || textField == self.fixedHeight {
+            maxLength = 4
+        }
+        else {
+            maxLength = 2
+        }
         let currentString: NSString = textField.text! as NSString
         let newString: NSString = currentString.replacingCharacters(in: range, with: string) as NSString
         return newString.length <= maxLength

@@ -10,9 +10,11 @@ import UIKit
 
 class CollectionViewController: ViewController, MGCollectionViewProtocol {
     
+    public var useFixedDimesnions : Bool = false
+    public var fixedDimensions : CGSize = CGSize.init(width: 0, height: 0)
     public var cellForRow : (iphonePortrait: Int, iphoneLandscape: Int, ipadPortrait: Int, ipadLandscape: Int) = (1, 3, 3, 4)
     public var cellSpacing : (left: CGFloat, top: CGFloat, right: CGFloat, bottom: CGFloat) = (1, 1, 1, 1)
-    public var cellProportion : CGSize = CGSize.init(width: 1, height: 1)
+    public var cellProportion : (width: CGFloat, height: CGFloat) = (width: 1, height: 1)
     public var usePullToRefresh : Bool = false
     public var useInfiniteScroll : Bool = false
     public var testWithRequest : Bool = false
@@ -35,9 +37,13 @@ class CollectionViewController: ViewController, MGCollectionViewProtocol {
         collectionView.useInfiniteScroll = useInfiniteScroll
         collectionView.cellIdentifier = MGCollectionViewCell.identifier
         collectionView.cellNib = UINib.init(nibName: MGCollectionViewCell.identifier, bundle: nil)
-        collectionView.cellProportion = cellProportion
-        collectionView.cellsSpacing = cellSpacing
-        collectionView.initWithCellFixedNumberForRow(cellForRow)
+        if useFixedDimesnions {
+            collectionView.initWithCellFixed(width: fixedDimensions.width, height: fixedDimensions.height)
+        }
+        else {
+            collectionView.initWithCellFixedNumberOf(cellForRow, cellProportions: cellProportion, andSpacing: cellSpacing)
+        }
+        
     }
 
     func itemSelected(item: Any) {
