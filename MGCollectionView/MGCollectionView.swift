@@ -11,10 +11,10 @@ import UIKit
 
 
 @objc protocol MGCollectionViewProtocol {
-    @objc func itemSelected(item: Any)
-    @objc func displayItem(_ item: Any, inCell cell: UICollectionViewCell) -> UICollectionViewCell
-    @objc func requestDataForPage(page: Int, valuesCallback: @escaping ([Any]?)->())
-    @objc optional func refreshControlStatus(animating: Bool)
+    @objc func collectionViewItemSelected(item: Any)
+    @objc func collectionViewDisplayItem(_ item: Any, inCell cell: UICollectionViewCell) -> UICollectionViewCell
+    @objc func collectionViewRequestDataForPage(page: Int, valuesCallback: @escaping ([Any]?)->())
+    @objc optional func collectionViewPullToRefreshControlStatusIs(animating: Bool)
     @objc optional func collectionViewEndUpdating(totalElements: Int)
 }
 
@@ -109,10 +109,7 @@ import UIKit
         else if cellClass != nil {
             self.register(cellClass, forCellWithReuseIdentifier: cellIdentifier!)
         }
-        else {
-            assertionFailure("#MGCollectionView: cellNib or cellClass required")
-        }
-        
+
         if pullToRefresh {
             cvRefreshControl.addTarget(self, action: #selector(refreshTriggered), for: .valueChanged)
             self.addSubview(cvRefreshControl)
