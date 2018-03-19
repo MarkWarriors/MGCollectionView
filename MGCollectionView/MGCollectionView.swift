@@ -128,14 +128,14 @@ import UIKit
         isLoading = true
         items.removeAll()
         currentPage = 0
-        if protocolDelegate?.refreshControlStatus != nil {
-            protocolDelegate?.refreshControlStatus!(animating: true)
+        if protocolDelegate?.collectionViewPullToRefreshControlStatusIs != nil {
+            protocolDelegate?.collectionViewPullToRefreshControlStatusIs!(animating: true)
         }
         askItemsForPage(currentPage)
     }
     
     func askItemsForPage(_ page: Int) {
-        protocolDelegate?.requestDataForPage(page: currentPage, valuesCallback: { (newValues) in
+        protocolDelegate?.collectionViewRequestDataForPage(page: currentPage, valuesCallback: { (newValues) in
             if newValues != nil && newValues!.count > 0 {
                 self.items.append(contentsOf: newValues!)
                 DispatchQueue.main.async {
@@ -144,8 +144,8 @@ import UIKit
                     }, completion: { (completed) in
                         if self.cvRefreshControl.isRefreshing {
                             self.cvRefreshControl.endRefreshing()
-                            if self.protocolDelegate?.refreshControlStatus != nil {
-                                self.protocolDelegate?.refreshControlStatus!(animating: false)
+                            if self.protocolDelegate?.collectionViewPullToRefreshControlStatusIs != nil {
+                                self.protocolDelegate?.collectionViewPullToRefreshControlStatusIs!(animating: false)
                             }
                             if self.protocolDelegate?.collectionViewEndUpdating != nil {
                                 self.protocolDelegate?.collectionViewEndUpdating!(totalElements: self.items.count)
@@ -196,7 +196,7 @@ import UIKit
     internal func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellIdentifier!, for: indexPath)
         if items.count > indexPath.row  && protocolDelegate != nil {
-            return (protocolDelegate?.displayItem(items[indexPath.row], inCell: cell))!
+            return (protocolDelegate?.collectionViewDisplayItem(items[indexPath.row], inCell: cell))!
         }
         return cell
     }
@@ -204,7 +204,7 @@ import UIKit
     internal func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         self.deselectItem(at: indexPath, animated: true)
         if items.count > indexPath.row {
-            protocolDelegate?.itemSelected(item: items[indexPath.row])
+            protocolDelegate?.collectionViewItemSelected(item: items[indexPath.row])
         }
     }
     

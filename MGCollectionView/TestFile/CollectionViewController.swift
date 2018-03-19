@@ -46,23 +46,26 @@ class CollectionViewController: ViewController, MGCollectionViewProtocol {
         
     }
 
-    func itemSelected(item: Any) {
+    func collectionViewItemSelected(item: Any) {
         print(item)
     }
     
-    func displayItem(_ item: Any, inCell cell: UICollectionViewCell) -> UICollectionViewCell{
+    func collectionViewDisplayItem(_ item: Any, inCell cell: UICollectionViewCell) -> UICollectionViewCell{
         let cellMg = cell as! MGCollectionViewCell
         cellMg.setItem(item as! [String])
         return cellMg
     }
     
     
-    func refreshControlStatus(animating: Bool) {
+    func collectionViewPullToRefreshControlStatusIs(animating: Bool) {
         print("Collection view refreshControl is animating? \(animating)")
     }
     
+    func collectionViewEndUpdating(totalElements: Int){
+        print("Collection view end update with a total of \(totalElements) elements")
+    }
     
-    func requestDataForPage(page: Int, valuesCallback: @escaping ([Any]?) -> ()) {
+    func collectionViewRequestDataForPage(page: Int, valuesCallback: @escaping ([Any]?) -> ()) {
         let itemPerPage : Int = 15
         if testWithRequest {
             print("Collection view request page \(page) - Test with web request")
