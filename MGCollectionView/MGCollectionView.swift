@@ -11,7 +11,7 @@ import UIKit
 
 
 @objc protocol MGCollectionViewProtocol {
-    @objc func collectionViewItemSelected(item: Any)
+    @objc func collectionViewSelected(cell: UICollectionViewCell, withItem: Any)
     @objc func collectionViewDisplayItem(_ item: Any, inCell cell: UICollectionViewCell) -> UICollectionViewCell
     @objc func collectionViewRequestDataForPage(page: Int, valuesCallback: @escaping ([Any]?)->())
     @objc optional func collectionViewPullToRefreshControlStatusIs(animating: Bool)
@@ -31,15 +31,15 @@ import UIKit
     }
     public typealias CellLayoutType = CellLayoutTypeEnum
     
-    
     var pullToRefresh : Bool = false
     var useInfiniteScroll : Bool = false
     var cellNib : UINib? = nil
     var cellIdentifier : String? = nil
     var cellClass : AnyClass? = nil
     var useLoaderAtBottom : Bool = true
+    var autoDeselectItem : Bool = true
     
-    public private(set) var items : [Any] = []
+    public var items : [Any] = []
     
     private var cellProportions : CellProportions = (width: 0, height: 0)
     private var cellSpacing : CellSpacing  = (top: 0, left: 0, bottom: 0, right: 0)
@@ -109,7 +109,7 @@ import UIKit
         else if cellClass != nil {
             self.register(cellClass, forCellWithReuseIdentifier: cellIdentifier!)
         }
-
+        
         if pullToRefresh {
             cvRefreshControl.addTarget(self, action: #selector(refreshTriggered), for: .valueChanged)
             self.addSubview(cvRefreshControl)
@@ -134,27 +134,43 @@ import UIKit
         askItemsForPage(currentPage)
     }
     
+    func clearItems(){
+        self.currentPage = 0
+        self.items.removeAll()
+        reloadCollectionView()
+    }
+    
+    func addItems(_ newItems: [Any]){
+        self.items.append(contentsOf: newItems)
+        reloadCollectionView()
+    }
+    
+    func reloadCollectionView(){
+        DispatchQueue.main.async {
+            self.reloadData()
+            self.performBatchUpdates({
+            }, completion: { (completed) in
+                if self.cvRefreshControl.isRefreshing {
+                    self.cvRefreshControl.endRefreshing()
+                    if self.protocolDelegate?.collectionViewPullToRefreshControlStatusIs != nil {
+                        self.protocolDelegate?.collectionViewPullToRefreshControlStatusIs!(animating: false)
+                    }
+                    if self.protocolDelegate?.collectionViewEndUpdating != nil {
+                        self.protocolDelegate?.collectionViewEndUpdating!(totalElements: self.items.count)
+                    }
+                }
+                if self.useInfiniteScroll {
+                    self.checkIfNeedMoreItems()
+                }
+                self.isLoading = false
+            })
+        }
+    }
+    
     func askItemsForPage(_ page: Int) {
         protocolDelegate?.collectionViewRequestDataForPage(page: currentPage, valuesCallback: { (newValues) in
             if newValues != nil && newValues!.count > 0 {
-                self.items.append(contentsOf: newValues!)
-                DispatchQueue.main.async {
-                    self.reloadData()
-                    self.performBatchUpdates({
-                    }, completion: { (completed) in
-                        if self.cvRefreshControl.isRefreshing {
-                            self.cvRefreshControl.endRefreshing()
-                            if self.protocolDelegate?.collectionViewPullToRefreshControlStatusIs != nil {
-                                self.protocolDelegate?.collectionViewPullToRefreshControlStatusIs!(animating: false)
-                            }
-                            if self.protocolDelegate?.collectionViewEndUpdating != nil {
-                                self.protocolDelegate?.collectionViewEndUpdating!(totalElements: self.items.count)
-                            }
-                        }
-                        self.isLoading = false
-                        self.checkIfNeedMoreItems()
-                    })
-                }
+                self.addItems(newValues!)
             }
             else {
                 self.endInifiniteScroll = true
@@ -196,15 +212,19 @@ import UIKit
     internal func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellIdentifier!, for: indexPath)
         if items.count > indexPath.row  && protocolDelegate != nil {
-            return (protocolDelegate?.collectionViewDisplayItem(items[indexPath.row], inCell: cell))!
+            let item = items[indexPath.row]
+            return (protocolDelegate?.collectionViewDisplayItem(item, inCell: cell))!
         }
         return cell
     }
     
     internal func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        self.deselectItem(at: indexPath, animated: true)
+        if autoDeselectItem {
+            self.deselectItem(at: indexPath, animated: true)
+        }
         if items.count > indexPath.row {
-            protocolDelegate?.collectionViewItemSelected(item: items[indexPath.row])
+            let item = items[indexPath.row]
+            protocolDelegate?.collectionViewSelected(cell: cell, withItem: item)
         }
     }
     
