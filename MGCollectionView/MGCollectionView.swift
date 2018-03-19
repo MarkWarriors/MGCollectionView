@@ -224,7 +224,7 @@ import UIKit
         }
         if items.count > indexPath.row {
             let item = items[indexPath.row]
-            protocolDelegate?.collectionViewSelected(cell: cell, withItem: item)
+            protocolDelegate?.collectionViewSelected(cell: cellForItem(at: indexPath)!, withItem: item)
         }
     }
     
