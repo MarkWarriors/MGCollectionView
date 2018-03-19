@@ -1,6 +1,6 @@
 
 # MGCollectionView
-A customized UICollectionView that give you the possibility to manage some things to get it work right (with adaptive layout for device type and orientation)
+Customized Swift UICollectionView, it allows you to easily create a collection view and initialize it with a fixed height/width for cell or a more usefull number of cells for row that you can change based on the device type (iphone/ipad) and the orientation of the device (landscape/portrait)
 
 ### INSTALLATION:
 Copy the MGCollectionView.swift in your project, and set it as class of an UICollectionView in storyboard (if you use it, or just instantiate in the code)
