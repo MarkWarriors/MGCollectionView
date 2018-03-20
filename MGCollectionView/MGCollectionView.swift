@@ -17,26 +17,26 @@ import UIKit
     @objc optional func collectionViewEndUpdating(totalElements: Int)
 }
 
+public typealias CellInARowForDeviceAndOrientation = (iphonePortrait: Int, iphoneLandscape: Int, ipadPortrait: Int, ipadLandscape: Int)
+public typealias CellProportions = (width: CGFloat, height: CGFloat)
+public typealias CellSpacing = (top: CGFloat, left: CGFloat, bottom: CGFloat, right: CGFloat)
+
+public enum CellLayoutTypeEnum {
+    case fixedWidthAndHeight
+    case fixedNumberForRow
+}
+public typealias CellLayoutType = CellLayoutTypeEnum
 
 @IBDesignable class MGCollectionView : UICollectionView, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout, UICollectionViewDataSource {
     
-    public typealias CellInARowForDeviceAndOrientation = (iphonePortrait: Int, iphoneLandscape: Int, ipadPortrait: Int, ipadLandscape: Int)
-    public typealias CellProportions = (width: CGFloat, height: CGFloat)
-    public typealias CellSpacing = (top: CGFloat, left: CGFloat, bottom: CGFloat, right: CGFloat)
+    @IBInspectable var pullToRefresh : Bool = false
+    @IBInspectable var useInfiniteScroll : Bool = false
+    @IBInspectable var useLoaderAtBottom : Bool = true
+    @IBInspectable var autoDeselectItem : Bool = true
     
-    public enum CellLayoutTypeEnum {
-        case fixedWidthAndHeight
-        case fixedNumberForRow
-    }
-    public typealias CellLayoutType = CellLayoutTypeEnum
-    
-    var pullToRefresh : Bool = false
-    var useInfiniteScroll : Bool = false
     var cellNib : UINib? = nil
     var cellIdentifier : String? = nil
     var cellClass : AnyClass? = nil
-    var useLoaderAtBottom : Bool = true
-    var autoDeselectItem : Bool = true
     
     public var items : [Any] = []
     
@@ -50,7 +50,8 @@ import UIKit
     private var isLoading : Bool = false
     private var endInifiniteScroll = false
     private var footerHeight : CGFloat = 0.0
-    
+    private var footerWidth : CGFloat = 0.0
+    private var flowLayout : UICollectionViewFlowLayout?
     public private(set)var cvRefreshControl : UIRefreshControl = UIRefreshControl()
     
     var protocolDelegate : MGCollectionViewProtocol? = nil
@@ -79,6 +80,13 @@ import UIKit
     private func initCollectionView() {
         self.delegate = self
         self.dataSource = self
+        
+        if let layout = self.collectionViewLayout as? UICollectionViewFlowLayout {
+            flowLayout = layout
+        }
+        else {
+            assertionFailure("#MGCollectionView: Needed flow layout for the MGCollectionView")
+        }
         
         if cellLayoutType == nil {
             print("#MGCollectionView: No layout type provided")
@@ -113,6 +121,11 @@ import UIKit
         if pullToRefresh {
             cvRefreshControl.addTarget(self, action: #selector(refreshTriggered), for: .valueChanged)
             self.addSubview(cvRefreshControl)
+            if flowLayout?.scrollDirection == .horizontal {
+            }
+            else {
+                
+            }
         }
         
         if useLoaderAtBottom {
@@ -186,18 +199,35 @@ import UIKit
     }
     
     private func checkIfNeedMoreItems(){
-        if contentSize.height < frame.size.height {
-            self.askItemsForPage(currentPage + 1)
+        if flowLayout?.scrollDirection == .horizontal {
+            if contentSize.width < frame.size.width {
+                self.askItemsForPage(currentPage + 1)
+            }
+        }
+        else {
+            if contentSize.height < frame.size.height {
+                self.askItemsForPage(currentPage + 1)
+            }
         }
     }
     
     internal func scrollViewDidScroll(_ scrollView: UIScrollView) {
         if useInfiniteScroll && !isLoading && self.items.count > 0 && !endInifiniteScroll {
-            let actualPosition : CGFloat = contentOffset.y + frame.size.height
-            let contentHeight = contentSize.height - (50)
-            if actualPosition >= contentHeight {
-                isLoading = true
-                self.askItemsForPage(currentPage + 1)
+            if flowLayout?.scrollDirection == .horizontal {
+                let actualPosition : CGFloat = contentOffset.x + frame.size.width
+                let contentWidth = contentSize.width - (50)
+                if actualPosition >= contentWidth {
+                    isLoading = true
+                    self.askItemsForPage(currentPage + 1)
+                }
+            }
+            else {
+                let actualPosition : CGFloat = contentOffset.y + frame.size.height
+                let contentHeight = contentSize.height - (50)
+                if actualPosition >= contentHeight {
+                    isLoading = true
+                    self.askItemsForPage(currentPage + 1)
+                }
             }
         }
     }
@@ -281,12 +311,20 @@ import UIKit
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForFooterInSection section: Int) -> CGSize {
         if useInfiniteScroll && !endInifiniteScroll && useLoaderAtBottom{
-            footerHeight = 70
+            if flowLayout?.scrollDirection == .horizontal {
+                footerWidth = 70
+                footerHeight = self.bounds.size.height
+            }
+            else {
+                footerWidth = self.bounds.size.width
+                footerHeight = 70
+            }
         }
         else {
             footerHeight = 0
+            footerWidth = 0
         }
-        return CGSize.init(width: self.bounds.size.width, height: footerHeight)
+        return CGSize.init(width: footerWidth, height: footerHeight)
     }
     
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
