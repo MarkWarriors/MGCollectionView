@@ -8,7 +8,7 @@
 
 import UIKit
 
-class ViewController: UIViewController, UITextFieldDelegate {
+class MainVC: UIViewController, UITextFieldDelegate {
 
     @IBOutlet weak var cellsForRowHeightConstraint: NSLayoutConstraint!
     @IBOutlet weak var fixedDimensionsHeightConstraint: NSLayoutConstraint!
@@ -28,6 +28,7 @@ class ViewController: UIViewController, UITextFieldDelegate {
     @IBOutlet weak var infiniteScrollSwitch: UISwitch!
     @IBOutlet weak var dataFromInternetSwitch: UISwitch!
     @IBOutlet weak var modeSwitch: UISwitch!
+    @IBOutlet weak var layoutDirectionSwitch: UISwitch!
     
     
     private var currentEditingTF : UITextField?
@@ -40,17 +41,16 @@ class ViewController: UIViewController, UITextFieldDelegate {
 
     @IBAction func modeSwitchChange(_ sender: Any) {
         if modeSwitch != nil {
-            if modeSwitch.isOn {
-                fixedDimensionsHeightConstraint.constant = 0
-                cellsForRowHeightConstraint.constant = 184
-            }
-            else {
-                fixedDimensionsHeightConstraint.constant = 64
-                cellsForRowHeightConstraint.constant = 0
-            }
-            
-            UIView.animate(withDuration: 0.2) {
-                self.view.layoutSubviews()
+            UIView.animate(withDuration: 0.25) {
+                if self.modeSwitch.isOn {
+                    self.fixedDimensionsHeightConstraint.constant = 0
+                    self.cellsForRowHeightConstraint.constant = 184
+                }
+                else {
+                    self.fixedDimensionsHeightConstraint.constant = 64
+                    self.cellsForRowHeightConstraint.constant = 0
+                }
+                self.view.layoutIfNeeded()
             }
         }
     }
@@ -91,7 +91,7 @@ class ViewController: UIViewController, UITextFieldDelegate {
                 width: CGFloat((fixedWidth.text! as NSString).floatValue),
                 height: CGFloat((fixedHeight.text! as NSString).floatValue)
             )
-            
+            dst.layoutDirection = layoutDirectionSwitch.isOn
             dst.useFixedDimesnions = !modeSwitch.isOn
             dst.usePullToRefresh = pullToRefreshSwitch.isOn
             dst.useInfiniteScroll = infiniteScrollSwitch.isOn

@@ -52,6 +52,12 @@ public typealias CellLayoutType = CellLayoutTypeEnum
     private var footerHeight : CGFloat = 0.0
     private var footerWidth : CGFloat = 0.0
     private var flowLayout : UICollectionViewFlowLayout?
+    private var triggeredHorizontalPullToRefresh : Bool = false
+    private var horizontalPtR : UIActivityIndicatorView?
+    private var horizontalPtRSize : CGFloat = 30
+    private var horizontalPtRTriggerinOffset : CGFloat = -70.0
+    private var horizontalPtrYConstraint : NSLayoutConstraint?
+    
     public private(set)var cvRefreshControl : UIRefreshControl = UIRefreshControl()
     
     var protocolDelegate : MGCollectionViewProtocol? = nil
@@ -102,7 +108,6 @@ public typealias CellLayoutType = CellLayoutTypeEnum
             }
         }
         
-        
         if self.cellProportions.width == 0 || self.cellProportions.height == 0 {
             assertionFailure("#MGCollectionView: cell proportion with a dimension equal to 0.")
         }
@@ -119,12 +124,22 @@ public typealias CellLayoutType = CellLayoutTypeEnum
         }
         
         if pullToRefresh {
-            cvRefreshControl.addTarget(self, action: #selector(refreshTriggered), for: .valueChanged)
-            self.addSubview(cvRefreshControl)
             if flowLayout?.scrollDirection == .horizontal {
+                horizontalPtR = UIActivityIndicatorView.init()
+                horizontalPtR!.isHidden = false
+                horizontalPtR!.alpha = 0
+                horizontalPtR!.translatesAutoresizingMaskIntoConstraints = false
+                horizontalPtR!.color = UIColor.black
+                horizontalPtR!.hidesWhenStopped = false
+                self.addSubview(horizontalPtR!)
+                horizontalPtR!.transform = CGAffineTransform(scaleX: 2, y: 2)
+                addConstraint(NSLayoutConstraint.init(item: horizontalPtR!, attribute: .centerY, relatedBy: .equal, toItem: self, attribute: .centerY, multiplier: 1, constant: 0))
+                horizontalPtrYConstraint = NSLayoutConstraint.init(item: horizontalPtR!, attribute: .leading, relatedBy: .equal, toItem: self, attribute: .leading, multiplier: 1, constant: 0)
+                addConstraint(horizontalPtrYConstraint!)
             }
             else {
-                
+                cvRefreshControl.addTarget(self, action: #selector(refreshTriggered), for: .valueChanged)
+                self.addSubview(cvRefreshControl)
             }
         }
         
@@ -174,10 +189,21 @@ public typealias CellLayoutType = CellLayoutTypeEnum
                 if self.useInfiniteScroll {
                     self.checkIfNeedMoreItems()
                 }
-                self.isLoading = false
+                self.endLoadingData()
             })
         }
     }
+    
+    func endLoadingData(){
+        self.isLoading = false
+        if self.triggeredHorizontalPullToRefresh && self.contentOffset.x < 0 {
+            triggeredHorizontalPullToRefresh = false
+            horizontalPtR?.alpha = 0
+            horizontalPtR?.stopAnimating()
+            self.setContentOffset(CGPoint.init(x: 0, y: self.contentOffset.y), animated: true)
+        }
+    }
+    
     
     func askItemsForPage(_ page: Int) {
         currentPage = page
@@ -190,10 +216,11 @@ public typealias CellLayoutType = CellLayoutTypeEnum
             }
             else {
                 self.endInifiniteScroll = true
-                self.isLoading = false
                 DispatchQueue.main.async {
+                    // remove footer
                     self.collectionViewLayout.invalidateLayout()
                 }
+                self.endLoadingData()
             }
         })
     }
@@ -211,23 +238,56 @@ public typealias CellLayoutType = CellLayoutTypeEnum
         }
     }
     
-    internal func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        if useInfiniteScroll && !isLoading && self.items.count > 0 && !endInifiniteScroll {
-            if flowLayout?.scrollDirection == .horizontal {
-                let actualPosition : CGFloat = contentOffset.x + frame.size.width
-                let contentWidth = contentSize.width - (50)
-                if actualPosition >= contentWidth {
-                    isLoading = true
-                    self.askItemsForPage(currentPage + 1)
-                }
+    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+        if triggeredHorizontalPullToRefresh {
+            if scrollView.contentOffset.x < horizontalPtRTriggerinOffset {
+                self.setContentOffset(CGPoint.init(x: horizontalPtRTriggerinOffset, y: scrollView.contentOffset.y), animated: true)
             }
             else {
-                let actualPosition : CGFloat = contentOffset.y + frame.size.height
-                let contentHeight = contentSize.height - (50)
-                if actualPosition >= contentHeight {
-                    isLoading = true
-                    self.askItemsForPage(currentPage + 1)
-                }
+                self.setContentOffset(CGPoint.init(x: 0, y: scrollView.contentOffset.y), animated: true)
+            }
+        }
+    }
+    
+    internal func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        // Horizontal pull to refresh
+        if triggeredHorizontalPullToRefresh && !scrollView.isDragging {
+            if scrollView.contentOffset.x < horizontalPtRTriggerinOffset {
+                self.setContentOffset(CGPoint.init(x: horizontalPtRTriggerinOffset, y: scrollView.contentOffset.y), animated: false)
+            }
+        }
+        else if !triggeredHorizontalPullToRefresh && flowLayout?.scrollDirection == .horizontal && pullToRefresh && !isLoading {
+            if scrollView.contentOffset.x < horizontalPtRTriggerinOffset {
+                triggeredHorizontalPullToRefresh = true
+                horizontalPtR?.startAnimating()
+                horizontalPtR?.alpha = 1
+                refreshTriggered()
+            }
+        }
+        if flowLayout?.scrollDirection == .horizontal && scrollView.contentOffset.x < 0{
+            self.sendSubview(toBack: horizontalPtR!)
+            if !horizontalPtR!.isAnimating {
+                horizontalPtR?.alpha = scrollView.contentOffset.x / horizontalPtRTriggerinOffset
+                let degrees = scrollView.contentOffset.x * 365 / horizontalPtRTriggerinOffset * CGFloat(Double.pi)/180
+                horizontalPtR?.transform = CGAffineTransform(rotationAngle: degrees)
+            }
+            horizontalPtrYConstraint?.constant = scrollView.contentOffset.x + ((abs(horizontalPtRTriggerinOffset) - horizontalPtRSize) / 2)
+        }
+        
+        if useInfiniteScroll && !isLoading && self.items.count > 0 && !endInifiniteScroll {
+            var actualPosition : CGFloat = 0
+            var contentReferenceSize : CGFloat = 0
+            if flowLayout?.scrollDirection == .horizontal {
+                actualPosition = contentOffset.x + frame.size.width
+                contentReferenceSize = contentSize.width - (50)
+            }
+            else {
+                actualPosition = contentOffset.y + frame.size.height
+                contentReferenceSize = contentSize.height - (50)
+            }
+            if actualPosition >= contentReferenceSize {
+                isLoading = true
+                self.askItemsForPage(currentPage + 1)
             }
         }
     }

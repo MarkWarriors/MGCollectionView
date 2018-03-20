@@ -8,7 +8,7 @@
 
 import UIKit
 
-class CollectionViewController: ViewController, MGCollectionViewProtocol {
+class CollectionViewController: UIViewController, MGCollectionViewProtocol {
   
     
     public var useFixedDimesnions : Bool = false
@@ -19,7 +19,7 @@ class CollectionViewController: ViewController, MGCollectionViewProtocol {
     public var usePullToRefresh : Bool = false
     public var useInfiniteScroll : Bool = false
     public var testWithRequest : Bool = false
-    
+    public var layoutDirection : Bool = false
     private var testarray : [[String]] = []
     private let spacexLaunchUrl : URL = URL.init(string: "https://api.spacexdata.com/v2/launches/")!
 
@@ -32,6 +32,13 @@ class CollectionViewController: ViewController, MGCollectionViewProtocol {
             item.append(randomString(length: 8) + " \(i)")
             item.append(randomString(length: 8) + " \(i)")
             testarray.append(item)
+        }
+        let layout = collectionView.collectionViewLayout as? UICollectionViewFlowLayout
+        if layoutDirection {
+            layout?.scrollDirection = .horizontal
+        }
+        else {
+            layout?.scrollDirection = .vertical
         }
         collectionView.protocolDelegate = self
         collectionView.pullToRefresh = usePullToRefresh
