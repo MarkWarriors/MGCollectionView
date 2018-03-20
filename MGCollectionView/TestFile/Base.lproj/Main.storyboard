@@ -31,11 +31,11 @@
             <objects>
                 <viewController title="MGCollectionView" id="BYZ-38-t0r" customClass="ViewController" customModule="MGCollectionView" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="1500"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="800"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <button opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="350" horizontalCompressionResistancePriority="500" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="yA9-Fa-7gp">
-                                <rect key="frame" x="0.0" y="1456" width="375" height="44"/>
+                                <rect key="frame" x="0.0" y="756" width="375" height="44"/>
                                 <color key="backgroundColor" cocoaTouchSystemColor="darkTextColor"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="44" id="emy-vY-udp"/>
@@ -49,7 +49,7 @@
                                 </connections>
                             </button>
                             <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Azd-tn-dX0">
-                                <rect key="frame" x="0.0" y="64" width="375" height="1392"/>
+                                <rect key="frame" x="0.0" y="64" width="375" height="692"/>
                                 <subviews>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="UAg-1H-g1b">
                                         <rect key="frame" x="0.0" y="0.0" width="375" height="656"/>
@@ -549,10 +549,14 @@ Landscape</string>
                     </view>
                     <navigationItem key="navigationItem" title="MGCollectionView" id="Q0s-pn-Fgs"/>
                     <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
-                    <size key="freeformSize" width="375" height="1500"/>
+                    <size key="freeformSize" width="375" height="800"/>
                     <connections>
                         <outlet property="cellProportionHeight" destination="bSY-Di-WsN" id="cQ0-xJ-roh"/>
                         <outlet property="cellProportionWidth" destination="qcf-jl-ifT" id="7VK-0c-S0h"/>
+                        <outlet property="cellSpacingBottom" destination="lCX-Gy-5DA" id="hrj-mg-RxI"/>
+                        <outlet property="cellSpacingLeft" destination="vFl-cD-aQh" id="feU-Si-454"/>
+                        <outlet property="cellSpacingRight" destination="wtE-Lf-kd1" id="MUO-JT-Srd"/>
+                        <outlet property="cellSpacingTop" destination="V9x-7F-dCx" id="yBy-WO-80z"/>
                         <outlet property="cellsForRowHeightConstraint" destination="mZW-Ug-x3U" id="MZT-e8-lMe"/>
                         <outlet property="dataFromInternetSwitch" destination="Egf-b2-7yv" id="XLl-Ci-JI4"/>
                         <outlet property="fixedDimensionsHeightConstraint" destination="11n-sB-NQS" id="Pay-JL-4mB"/>
@@ -582,7 +586,7 @@ Landscape</string>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="nnH-4g-VnA" customClass="MGCollectionView" customModule="MGCollectionView" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="VwK-Ub-SP6">
+                                <collectionViewFlowLayout key="collectionViewLayout" scrollDirection="horizontal" minimumLineSpacing="10" minimumInteritemSpacing="10" id="jyK-ce-QAK">
                                     <size key="itemSize" width="50" height="50"/>
                                     <size key="headerReferenceSize" width="0.0" height="0.0"/>
                                     <size key="footerReferenceSize" width="0.0" height="0.0"/>
