@@ -9,6 +9,7 @@
 import UIKit
 
 class CollectionViewController: ViewController, MGCollectionViewProtocol {
+  
     
     public var useFixedDimesnions : Bool = false
     public var fixedDimensions : CGSize = CGSize.init(width: 0, height: 0)
@@ -38,7 +39,7 @@ class CollectionViewController: ViewController, MGCollectionViewProtocol {
         collectionView.cellIdentifier = MGCollectionViewCell.identifier
         collectionView.cellNib = UINib.init(nibName: MGCollectionViewCell.identifier, bundle: nil)
         if useFixedDimesnions {
-            collectionView.initWithCellFixed(width: fixedDimensions.width, height: fixedDimensions.height)
+            collectionView.initWithCellFixed(width: fixedDimensions.width, height: fixedDimensions.height, andSpacing: cellSpacing)
         }
         else {
             collectionView.initWithCellFixedNumberOf(cellForRow, cellProportions: cellProportion, andSpacing: cellSpacing)
@@ -46,8 +47,8 @@ class CollectionViewController: ViewController, MGCollectionViewProtocol {
         
     }
 
-    func collectionViewItemSelected(item: Any) {
-        print(item)
+    func collectionViewSelected(cell: UICollectionViewCell, withItem item: Any) {
+        print("selected: \(item)")
     }
     
     func collectionViewDisplayItem(_ item: Any, inCell cell: UICollectionViewCell) -> UICollectionViewCell{

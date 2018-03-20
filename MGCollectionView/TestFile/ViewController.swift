@@ -42,7 +42,7 @@ class ViewController: UIViewController, UITextFieldDelegate {
         if modeSwitch != nil {
             if modeSwitch.isOn {
                 fixedDimensionsHeightConstraint.constant = 0
-                cellsForRowHeightConstraint.constant = 304
+                cellsForRowHeightConstraint.constant = 184
             }
             else {
                 fixedDimensionsHeightConstraint.constant = 64

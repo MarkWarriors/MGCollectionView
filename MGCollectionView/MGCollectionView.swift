@@ -9,9 +9,8 @@
 import UIKit
 
 
-
 @objc protocol MGCollectionViewProtocol {
-    @objc func collectionViewSelected(cell: UICollectionViewCell, withItem: Any)
+    @objc func collectionViewSelected(cell: UICollectionViewCell, withItem item: Any)
     @objc func collectionViewDisplayItem(_ item: Any, inCell cell: UICollectionViewCell) -> UICollectionViewCell
     @objc func collectionViewRequestDataForPage(page: Int, valuesCallback: @escaping ([Any]?)->())
     @objc optional func collectionViewPullToRefreshControlStatusIs(animating: Bool)
@@ -60,10 +59,11 @@ import UIKit
         super.draw(rect)
     }
     
-    func initWithCellFixed(width: CGFloat, height: CGFloat){
+    func initWithCellFixed(width: CGFloat, height: CGFloat, andSpacing spacing: CellSpacing){
         cellLayoutType = .fixedWidthAndHeight
         self.cellsWidth = width
         self.cellsHeight = height
+        self.cellSpacing = spacing
         self.cellProportions = (width: width, height: height)
         initCollectionView()
     }
@@ -119,7 +119,7 @@ import UIKit
             self.register(MGCollectionViewFooter.self, forSupplementaryViewOfKind: UICollectionElementKindSectionFooter, withReuseIdentifier: "Footer")
         }
         
-        askItemsForPage(currentPage)
+        askItemsForPage(0)
     }
     
     @objc
@@ -127,11 +127,10 @@ import UIKit
         endInifiniteScroll = false
         isLoading = true
         items.removeAll()
-        currentPage = 0
         if protocolDelegate?.collectionViewPullToRefreshControlStatusIs != nil {
             protocolDelegate?.collectionViewPullToRefreshControlStatusIs!(animating: true)
         }
-        askItemsForPage(currentPage)
+        askItemsForPage(0)
     }
     
     func clearItems(){
@@ -168,6 +167,10 @@ import UIKit
     }
     
     func askItemsForPage(_ page: Int) {
+        currentPage = page
+        if currentPage == 0 {
+            self.items.removeAll()
+        }
         protocolDelegate?.collectionViewRequestDataForPage(page: currentPage, valuesCallback: { (newValues) in
             if newValues != nil && newValues!.count > 0 {
                 self.addItems(newValues!)
@@ -184,8 +187,7 @@ import UIKit
     
     private func checkIfNeedMoreItems(){
         if contentSize.height < frame.size.height {
-            currentPage += 1
-            self.askItemsForPage(currentPage)
+            self.askItemsForPage(currentPage + 1)
         }
     }
     
@@ -195,8 +197,7 @@ import UIKit
             let contentHeight = contentSize.height - (50)
             if actualPosition >= contentHeight {
                 isLoading = true
-                currentPage = currentPage + 1
-                askItemsForPage(currentPage)
+                self.askItemsForPage(currentPage + 1)
             }
         }
     }
@@ -266,10 +267,7 @@ import UIKit
     
     internal func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
         if cellLayoutType == .fixedWidthAndHeight {
-            let width = cellsWidth
-            let estimatedCellsForRow : Int = Int(floor(self.frame.size.width / width))
-            let estimatedSpacing : CGFloat = (self.frame.size.width - (CGFloat(estimatedCellsForRow) * width)) / CGFloat(estimatedCellsForRow * 2)
-            return UIEdgeInsetsMake(estimatedSpacing, estimatedSpacing, estimatedSpacing, estimatedSpacing)
+            return UIEdgeInsetsMake(cellSpacing.top, cellSpacing.left, cellSpacing.bottom, cellSpacing.right)
         }
         else if cellLayoutType == .fixedNumberForRow {
             return UIEdgeInsetsMake(cellSpacing.top, cellSpacing.left, cellSpacing.bottom, cellSpacing.right)

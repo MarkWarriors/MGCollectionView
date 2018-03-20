@@ -23,7 +23,7 @@ And also in the ViewController set the paramters that you want
     collectionView.cellClass // String - name of your cell class. REQUIRED if not setted cellNib
     
 #### Init the CollectionView:
-    collectionView.initWithCellFixed(width: CGFloat, height: CGFloat) // Setup the CollectionView with fixed width and height for cells
+    collectionView.initWithCellFixed(width: CGFloat, height: CGFloat, andSpacing spacing: CellSpacing) // Setup the CollectionView with fixed width and height for cells and the spacing between them
     collectionView.initWithCellFixedNumberOf(cellForRow, cellProportions: (CGFloat, CGFloat), andSpacing: (CGFloat, CGFloat, CGFloat, CGFloat)) // Setup the CollectionView with fixed numbver of rows
 
 #### Screenshots:
