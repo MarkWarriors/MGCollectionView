@@ -131,8 +131,7 @@ public typealias CellLayoutType = CellLayoutTypeEnum
                 horizontalPtR!.translatesAutoresizingMaskIntoConstraints = false
                 horizontalPtR!.color = UIColor.black
                 horizontalPtR!.hidesWhenStopped = false
-                self.addSubview(horizontalPtR!)
-                self.sendSubview(toBack: horizontalPtR!)
+                self.insertSubview(self.horizontalPtR!, at: 0)
                 addConstraint(NSLayoutConstraint.init(item: horizontalPtR!, attribute: .bottom, relatedBy: .equal, toItem: self, attribute: .centerY, multiplier: 1, constant: 0))
                 horizontalPtrYConstraint = NSLayoutConstraint.init(item: horizontalPtR!, attribute: .leading, relatedBy: .equal, toItem: self, attribute: .leading, multiplier: 1, constant: 0)
                 addConstraint(horizontalPtrYConstraint!)
@@ -177,18 +176,6 @@ public typealias CellLayoutType = CellLayoutTypeEnum
             self.reloadData()
             self.performBatchUpdates({
             }, completion: { (completed) in
-                if self.cvRefreshControl.isRefreshing {
-                    self.cvRefreshControl.endRefreshing()
-                    if self.protocolDelegate?.collectionViewPullToRefreshControlStatusIs != nil {
-                        self.protocolDelegate?.collectionViewPullToRefreshControlStatusIs!(animating: false)
-                    }
-                    if self.protocolDelegate?.collectionViewEndUpdating != nil {
-                        self.protocolDelegate?.collectionViewEndUpdating!(totalElements: self.items.count)
-                    }
-                }
-                if self.useInfiniteScroll {
-                    self.checkIfNeedMoreItems()
-                }
                 self.endLoadingData()
             })
         }
@@ -196,13 +183,31 @@ public typealias CellLayoutType = CellLayoutTypeEnum
     
     func endLoadingData(){
         self.isLoading = false
-        if self.triggeredHorizontalPullToRefresh {
-            triggeredHorizontalPullToRefresh = false
-            horizontalPtR?.alpha = 0
-            horizontalPtR?.stopAnimating()
-            if self.contentOffset.x < 0 {
-                self.setContentOffset(CGPoint.init(x: 0, y: self.contentOffset.y), animated: true)
+        if pullToRefresh {
+            if flowLayout?.scrollDirection == .vertical && self.cvRefreshControl.isRefreshing {
+                self.cvRefreshControl.endRefreshing()
+                if self.protocolDelegate?.collectionViewPullToRefreshControlStatusIs != nil {
+                    self.protocolDelegate?.collectionViewPullToRefreshControlStatusIs!(animating: false)
+                }
+                if self.protocolDelegate?.collectionViewEndUpdating != nil {
+                    self.protocolDelegate?.collectionViewEndUpdating!(totalElements: self.items.count)
+                }
             }
+            
+            if flowLayout?.scrollDirection == .horizontal && self.triggeredHorizontalPullToRefresh {
+                triggeredHorizontalPullToRefresh = false
+                horizontalPtR?.alpha = 0
+                horizontalPtR?.stopAnimating()
+                if self.contentOffset.x < 0 {
+                    self.setContentOffset(CGPoint.init(x: 0, y: self.contentOffset.y), animated: true)
+                }
+                if protocolDelegate?.collectionViewPullToRefreshControlStatusIs != nil {
+                    protocolDelegate?.collectionViewPullToRefreshControlStatusIs!(animating: false)
+                }
+            }
+        }
+        if self.useInfiniteScroll {
+            self.checkIfNeedMoreItems()
         }
     }
     
@@ -250,42 +255,50 @@ public typealias CellLayoutType = CellLayoutTypeEnum
             }
         }
     }
-    
+    var moving = false
     internal func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        // Horizontal pull to refresh
-        if triggeredHorizontalPullToRefresh && !scrollView.isDragging {
-            if scrollView.contentOffset.x < horizontalPtRTriggerinOffset {
-                self.setContentOffset(CGPoint.init(x: horizontalPtRTriggerinOffset, y: scrollView.contentOffset.y), animated: false)
+        let offsetX = scrollView.contentOffset.x
+        let offsetY = scrollView.contentOffset.y
+        if flowLayout?.scrollDirection == .horizontal && pullToRefresh {
+            // Horizontal pull to refresh
+            if triggeredHorizontalPullToRefresh && !scrollView.isDragging {
+                if offsetX < horizontalPtRTriggerinOffset && !moving {
+                    moving = true
+                    self.setContentOffset(CGPoint.init(x: horizontalPtRTriggerinOffset, y: offsetY), animated: true)
+                }
+                if moving && floor(offsetX) == horizontalPtRTriggerinOffset {
+                    self.setContentOffset(contentOffset, animated: false)
+                    moving = false
+                }
             }
-        }
-        else if !triggeredHorizontalPullToRefresh && flowLayout?.scrollDirection == .horizontal && pullToRefresh && !isLoading {
-            if scrollView.contentOffset.x < horizontalPtRTriggerinOffset {
-                triggeredHorizontalPullToRefresh = true
-                horizontalPtR?.startAnimating()
-                horizontalPtR?.alpha = 1
-                refreshTriggered()
+            else if !triggeredHorizontalPullToRefresh && pullToRefresh && !isLoading {
+                if offsetX < horizontalPtRTriggerinOffset {
+                    triggeredHorizontalPullToRefresh = true
+                    horizontalPtR?.startAnimating()
+                    horizontalPtR?.alpha = 1
+                    refreshTriggered()
+                }
             }
-        }
-        
-        if flowLayout?.scrollDirection == .horizontal && scrollView.contentOffset.x < 0{
-            if !triggeredHorizontalPullToRefresh {
-                horizontalPtR?.alpha = (scrollView.contentOffset.x + 10) / horizontalPtRTriggerinOffset
-                let degrees = (scrollView.contentOffset.x + 10) * 365 / horizontalPtRTriggerinOffset * CGFloat(Double.pi)/180
-                horizontalPtR?.transform = CGAffineTransform(rotationAngle: degrees)
+            
+            if offsetX < 0{
+                if !triggeredHorizontalPullToRefresh {
+                    horizontalPtR?.alpha = (offsetX + 10) / horizontalPtRTriggerinOffset
+                    let degrees = (offsetX + 10) * 365 / horizontalPtRTriggerinOffset * CGFloat(Double.pi)/180
+                    horizontalPtR?.transform = CGAffineTransform(rotationAngle: degrees)
+                }
+                horizontalPtrYConstraint?.constant = offsetX + 10
             }
-            horizontalPtrYConstraint?.constant = scrollView.contentOffset.x + 10
-//            horizontalPtrYConstraint?.constant = scrollView.contentOffset.x + ((abs(horizontalPtRTriggerinOffset) - horizontalPtRSize) / 2)
         }
         
         if useInfiniteScroll && !isLoading && self.items.count > 0 && !endInifiniteScroll {
             var actualPosition : CGFloat = 0
             var contentReferenceSize : CGFloat = 0
             if flowLayout?.scrollDirection == .horizontal {
-                actualPosition = contentOffset.x + frame.size.width
+                actualPosition = offsetX + frame.size.width
                 contentReferenceSize = contentSize.width - (50)
             }
             else {
-                actualPosition = contentOffset.y + frame.size.height
+                actualPosition = offsetY + frame.size.height
                 contentReferenceSize = contentSize.height - (50)
             }
             if actualPosition >= contentReferenceSize {
@@ -368,11 +381,13 @@ public typealias CellLayoutType = CellLayoutTypeEnum
         return UIEdgeInsetsMake(0, 0, 0, 0)
     }
     
+    
     internal func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
         return 0
     }
     
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForFooterInSection section: Int) -> CGSize {
+    
+    internal func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForFooterInSection section: Int) -> CGSize {
         if useInfiniteScroll && !endInifiniteScroll && useLoaderAtBottom{
             if flowLayout?.scrollDirection == .horizontal {
                 footerWidth = 70
@@ -390,14 +405,15 @@ public typealias CellLayoutType = CellLayoutTypeEnum
         return CGSize.init(width: footerWidth, height: footerHeight)
     }
     
-    func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
+    
+    internal func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         if kind == UICollectionElementKindSectionFooter && useLoaderAtBottom {
             return dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "Footer", for: indexPath) as! MGCollectionViewFooter
         }
         return UICollectionReusableView.init(frame: CGRect.zero)
     }
     
-    func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+    func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
     }
     
 }
