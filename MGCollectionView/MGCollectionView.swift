@@ -132,8 +132,8 @@ public typealias CellLayoutType = CellLayoutTypeEnum
                 horizontalPtR!.color = UIColor.black
                 horizontalPtR!.hidesWhenStopped = false
                 self.addSubview(horizontalPtR!)
-                horizontalPtR!.transform = CGAffineTransform(scaleX: 2, y: 2)
-                addConstraint(NSLayoutConstraint.init(item: horizontalPtR!, attribute: .centerY, relatedBy: .equal, toItem: self, attribute: .centerY, multiplier: 1, constant: 0))
+                self.sendSubview(toBack: horizontalPtR!)
+                addConstraint(NSLayoutConstraint.init(item: horizontalPtR!, attribute: .bottom, relatedBy: .equal, toItem: self, attribute: .centerY, multiplier: 1, constant: 0))
                 horizontalPtrYConstraint = NSLayoutConstraint.init(item: horizontalPtR!, attribute: .leading, relatedBy: .equal, toItem: self, attribute: .leading, multiplier: 1, constant: 0)
                 addConstraint(horizontalPtrYConstraint!)
             }
@@ -196,11 +196,13 @@ public typealias CellLayoutType = CellLayoutTypeEnum
     
     func endLoadingData(){
         self.isLoading = false
-        if self.triggeredHorizontalPullToRefresh && self.contentOffset.x < 0 {
+        if self.triggeredHorizontalPullToRefresh {
             triggeredHorizontalPullToRefresh = false
             horizontalPtR?.alpha = 0
             horizontalPtR?.stopAnimating()
-            self.setContentOffset(CGPoint.init(x: 0, y: self.contentOffset.y), animated: true)
+            if self.contentOffset.x < 0 {
+                self.setContentOffset(CGPoint.init(x: 0, y: self.contentOffset.y), animated: true)
+            }
         }
     }
     
@@ -227,7 +229,7 @@ public typealias CellLayoutType = CellLayoutTypeEnum
     
     private func checkIfNeedMoreItems(){
         if flowLayout?.scrollDirection == .horizontal {
-            if contentSize.width < frame.size.width {
+            if contentSize.width < frame.size.width && !triggeredHorizontalPullToRefresh {
                 self.askItemsForPage(currentPage + 1)
             }
         }
@@ -264,14 +266,15 @@ public typealias CellLayoutType = CellLayoutTypeEnum
                 refreshTriggered()
             }
         }
+        
         if flowLayout?.scrollDirection == .horizontal && scrollView.contentOffset.x < 0{
-            self.sendSubview(toBack: horizontalPtR!)
-            if !horizontalPtR!.isAnimating {
-                horizontalPtR?.alpha = scrollView.contentOffset.x / horizontalPtRTriggerinOffset
-                let degrees = scrollView.contentOffset.x * 365 / horizontalPtRTriggerinOffset * CGFloat(Double.pi)/180
+            if !triggeredHorizontalPullToRefresh {
+                horizontalPtR?.alpha = (scrollView.contentOffset.x + 10) / horizontalPtRTriggerinOffset
+                let degrees = (scrollView.contentOffset.x + 10) * 365 / horizontalPtRTriggerinOffset * CGFloat(Double.pi)/180
                 horizontalPtR?.transform = CGAffineTransform(rotationAngle: degrees)
             }
-            horizontalPtrYConstraint?.constant = scrollView.contentOffset.x + ((abs(horizontalPtRTriggerinOffset) - horizontalPtRSize) / 2)
+            horizontalPtrYConstraint?.constant = scrollView.contentOffset.x + 10
+//            horizontalPtrYConstraint?.constant = scrollView.contentOffset.x + ((abs(horizontalPtRTriggerinOffset) - horizontalPtRSize) / 2)
         }
         
         if useInfiniteScroll && !isLoading && self.items.count > 0 && !endInifiniteScroll {
@@ -394,6 +397,8 @@ public typealias CellLayoutType = CellLayoutTypeEnum
         return UICollectionReusableView.init(frame: CGRect.zero)
     }
     
+    func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+    }
     
 }
 
