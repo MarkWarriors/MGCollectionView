@@ -77,17 +77,41 @@
 		90B976D020567174000795D2 /* TestFile */ = {
 			isa = PBXGroup;
 			children = (
-				90B976D120567174000795D2 /* MainVC.swift */,
+				90EA96EC2063F10100A8382F /* Views */,
+				90EA96EB2063F0F800A8382F /* App */,
+				90EA96EA2063F0F100A8382F /* VC */,
 				90B976D220567174000795D2 /* Assets.xcassets */,
-				90B976D320567174000795D2 /* MGCollectionViewCell.swift */,
-				90B976E5205671CF000795D2 /* Extensions.swift */,
 				90B976D420567174000795D2 /* LaunchScreen.storyboard */,
 				90B976D620567174000795D2 /* Main.storyboard */,
-				90B976D820567174000795D2 /* AppDelegate.swift */,
-				90B976D920567174000795D2 /* MGCollectionViewCell.xib */,
-				90B976DA20567174000795D2 /* CollectionViewController.swift */,
 			);
 			path = TestFile;
+			sourceTree = "<group>";
+		};
+		90EA96EA2063F0F100A8382F /* VC */ = {
+			isa = PBXGroup;
+			children = (
+				90B976D120567174000795D2 /* MainVC.swift */,
+				90B976DA20567174000795D2 /* CollectionViewController.swift */,
+			);
+			path = VC;
+			sourceTree = "<group>";
+		};
+		90EA96EB2063F0F800A8382F /* App */ = {
+			isa = PBXGroup;
+			children = (
+				90B976D820567174000795D2 /* AppDelegate.swift */,
+				90B976E5205671CF000795D2 /* Extensions.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		90EA96EC2063F10100A8382F /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				90B976D920567174000795D2 /* MGCollectionViewCell.xib */,
+				90B976D320567174000795D2 /* MGCollectionViewCell.swift */,
+			);
+			path = Views;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

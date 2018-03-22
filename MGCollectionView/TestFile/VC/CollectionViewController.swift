@@ -46,7 +46,7 @@ class CollectionViewController: UIViewController, MGCollectionViewProtocol {
         collectionView.cellIdentifier = MGCollectionViewCell.identifier
         collectionView.cellNib = UINib.init(nibName: MGCollectionViewCell.identifier, bundle: nil)
         if useFixedDimesnions {
-            collectionView.initWithCellFixed(width: fixedDimensions.width, height: fixedDimensions.height, andSpacing: cellSpacing)
+            collectionView.initWithCellFixed(width: fixedDimensions.width, height: fixedDimensions.height, andMinimumSpacingBetweenCells: cellSpacing)
         }
         else {
             collectionView.initWithCellFixedNumberOf(cellForRow, cellProportions: cellProportion, andSpacing: cellSpacing)
@@ -77,7 +77,7 @@ class CollectionViewController: UIViewController, MGCollectionViewProtocol {
         let itemPerPage : Int = 15
         if testWithRequest {
             print("Collection view request page \(page) - Test with web request")
-            DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2), execute: { // Just for show the loader
+            DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(5), execute: { // Just for show the loader
                 var request = URLRequest(url: self.spacexLaunchUrl)
                 request.httpMethod = "GET"
                 

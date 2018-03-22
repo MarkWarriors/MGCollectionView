@@ -17,9 +17,17 @@ import UIKit
     @objc optional func collectionViewEndUpdating(totalElements: Int)
 }
 
-public typealias CellInARowForDeviceAndOrientation = (iphonePortrait: Int, iphoneLandscape: Int, ipadPortrait: Int, ipadLandscape: Int)
+public typealias CellsForDeviceAndOrientation = (iphonePortrait: Int, iphoneLandscape: Int, ipadPortrait: Int, ipadLandscape: Int)
 public typealias CellProportions = (width: CGFloat, height: CGFloat)
 public typealias CellSpacing = (top: CGFloat, left: CGFloat, bottom: CGFloat, right: CGFloat)
+
+public enum IdiomAndOrientationEnum {
+    case iPhonePortrait
+    case iPhoneLandscape
+    case iPadPortrait
+    case iPadLandscape
+}
+public typealias IdiomAndOrientation = IdiomAndOrientationEnum
 
 public enum CellLayoutTypeEnum {
     case fixedWidthAndHeight
@@ -45,7 +53,7 @@ public typealias CellLayoutType = CellLayoutTypeEnum
     private var cellLayoutType : CellLayoutType?
     private var cellsWidth : CGFloat = 0
     private var cellsHeight : CGFloat = 0
-    private var cellsForRow : CellInARowForDeviceAndOrientation = (1, 1, 1, 1)
+    private var cellsForRow : CellsForDeviceAndOrientation = (1, 1, 1, 1)
     private var currentPage : Int = 0
     private var isLoading : Bool = false
     private var endInifiniteScroll = false
@@ -57,7 +65,9 @@ public typealias CellLayoutType = CellLayoutTypeEnum
     private var horizontalPtRSize : CGFloat = 30
     private var horizontalPtRTriggerinOffset : CGFloat = -70.0
     private var horizontalPtrYConstraint : NSLayoutConstraint?
-    
+    private var scrollViewIsMovingToHorizontalPtrTriggeringOffset = false
+    private var currentOrientation : UIInterfaceOrientation = UIApplication.shared.statusBarOrientation
+    private var lastOffsetX : CGFloat = 0
     public private(set)var cvRefreshControl : UIRefreshControl = UIRefreshControl()
     
     var protocolDelegate : MGCollectionViewProtocol? = nil
@@ -66,7 +76,7 @@ public typealias CellLayoutType = CellLayoutTypeEnum
         super.draw(rect)
     }
     
-    func initWithCellFixed(width: CGFloat, height: CGFloat, andSpacing spacing: CellSpacing){
+    func initWithCellFixed(width: CGFloat, height: CGFloat, andMinimumSpacingBetweenCells spacing: CellSpacing) {
         cellLayoutType = .fixedWidthAndHeight
         self.cellsWidth = width
         self.cellsHeight = height
@@ -75,7 +85,7 @@ public typealias CellLayoutType = CellLayoutTypeEnum
         initCollectionView()
     }
     
-    func initWithCellFixedNumberOf(_ cellsForRow: CellInARowForDeviceAndOrientation, cellProportions proportions: CellProportions, andSpacing spacing: CellSpacing){
+    func initWithCellFixedNumberOf(_ cellsForRow: CellsForDeviceAndOrientation, cellProportions proportions: CellProportions, andSpacing spacing: CellSpacing) {
         self.cellLayoutType = .fixedNumberForRow
         self.cellsForRow = cellsForRow
         self.cellProportions = proportions
@@ -146,8 +156,31 @@ public typealias CellLayoutType = CellLayoutTypeEnum
             self.register(MGCollectionViewFooter.self, forSupplementaryViewOfKind: UICollectionElementKindSectionFooter, withReuseIdentifier: "Footer")
         }
         
+        NotificationCenter.default.addObserver(self, selector: #selector(willChangeOrientation), name: NSNotification.Name.UIApplicationWillChangeStatusBarOrientation, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(didChangeOrientation), name: NSNotification.Name.UIApplicationDidChangeStatusBarOrientation, object: nil)
+        
         askItemsForPage(0)
     }
+    
+    
+    override func willMove(toWindow newWindow: UIWindow?) {
+        if newWindow == nil {
+            NotificationCenter.default.removeObserver(self, name: NSNotification.Name.UIApplicationWillChangeStatusBarOrientation, object: nil)
+            NotificationCenter.default.removeObserver(self, name: NSNotification.Name.UIApplicationDidChangeStatusBarOrientation, object: nil)
+        }
+    }
+    
+    
+    @objc func willChangeOrientation() {
+        lastOffsetX = contentOffset.x
+    }
+    
+    
+    @objc func didChangeOrientation() {
+        currentOrientation = UIApplication.shared.statusBarOrientation
+    }
+    
+    
     
     @objc
     private func refreshTriggered() {
@@ -160,18 +193,18 @@ public typealias CellLayoutType = CellLayoutTypeEnum
         askItemsForPage(0)
     }
     
-    func clearItems(){
+    func clearItems() {
         self.currentPage = 0
         self.items.removeAll()
         reloadCollectionView()
     }
     
-    func addItems(_ newItems: [Any]){
+    func addItems(_ newItems: [Any]) {
         self.items.append(contentsOf: newItems)
         reloadCollectionView()
     }
     
-    func reloadCollectionView(){
+    func reloadCollectionView() {
         DispatchQueue.main.async {
             self.reloadData()
             self.performBatchUpdates({
@@ -181,7 +214,7 @@ public typealias CellLayoutType = CellLayoutTypeEnum
         }
     }
     
-    func endLoadingData(){
+    func endLoadingData() {
         self.isLoading = false
         if pullToRefresh {
             if flowLayout?.scrollDirection == .vertical && self.cvRefreshControl.isRefreshing {
@@ -206,9 +239,8 @@ public typealias CellLayoutType = CellLayoutTypeEnum
                 }
             }
         }
-        if self.useInfiniteScroll {
-            self.checkIfNeedMoreItems()
-        }
+        
+        self.checkIfNeedMoreItems()
     }
     
     
@@ -232,16 +264,50 @@ public typealias CellLayoutType = CellLayoutTypeEnum
         })
     }
     
-    private func checkIfNeedMoreItems(){
-        if flowLayout?.scrollDirection == .horizontal {
-            if contentSize.width < frame.size.width && !triggeredHorizontalPullToRefresh {
-                self.askItemsForPage(currentPage + 1)
+    private func checkIfNeedMoreItems() {
+        if self.useInfiniteScroll {
+            if flowLayout?.scrollDirection == .horizontal {
+                if contentSize.width < frame.size.width && !triggeredHorizontalPullToRefresh {
+                    self.askItemsForPage(currentPage + 1)
+                }
+            }
+            else {
+                if contentSize.height < frame.size.height {
+                    self.askItemsForPage(currentPage + 1)
+                }
+            }
+        }
+    }
+    
+    func deviceOrientationAndIdiom() -> IdiomAndOrientationEnum {
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            if  currentOrientation.isPortrait {
+                return .iPadPortrait
+            }
+            else {
+                return .iPadLandscape
             }
         }
         else {
-            if contentSize.height < frame.size.height {
-                self.askItemsForPage(currentPage + 1)
+            if currentOrientation.isPortrait {
+                return .iPhonePortrait
             }
+            else {
+                return .iPhoneLandscape
+            }
+        }
+    }
+    
+    func pickCorrectCellsForRow() -> Int {
+        switch(deviceOrientationAndIdiom()) {
+            case .iPhonePortrait:
+                return cellsForRow.iphonePortrait
+            case .iPhoneLandscape:
+                return cellsForRow.iphoneLandscape
+            case .iPadPortrait:
+                return cellsForRow.ipadLandscape
+            case .iPadLandscape:
+                return cellsForRow.ipadPortrait
         }
     }
     
@@ -255,20 +321,21 @@ public typealias CellLayoutType = CellLayoutTypeEnum
             }
         }
     }
-    var moving = false
+    
+    
     internal func scrollViewDidScroll(_ scrollView: UIScrollView) {
         let offsetX = scrollView.contentOffset.x
         let offsetY = scrollView.contentOffset.y
         if flowLayout?.scrollDirection == .horizontal && pullToRefresh {
             // Horizontal pull to refresh
             if triggeredHorizontalPullToRefresh && !scrollView.isDragging {
-                if offsetX < horizontalPtRTriggerinOffset && !moving {
-                    moving = true
+                if offsetX < horizontalPtRTriggerinOffset && !scrollViewIsMovingToHorizontalPtrTriggeringOffset {
+                    scrollViewIsMovingToHorizontalPtrTriggeringOffset = true
                     self.setContentOffset(CGPoint.init(x: horizontalPtRTriggerinOffset, y: offsetY), animated: true)
                 }
-                if moving && floor(offsetX) == horizontalPtRTriggerinOffset {
+                if scrollViewIsMovingToHorizontalPtrTriggeringOffset && floor(offsetX) == horizontalPtRTriggerinOffset {
                     self.setContentOffset(contentOffset, animated: false)
-                    moving = false
+                    scrollViewIsMovingToHorizontalPtrTriggeringOffset = false
                 }
             }
             else if !triggeredHorizontalPullToRefresh && pullToRefresh && !isLoading {
@@ -346,25 +413,7 @@ public typealias CellLayoutType = CellLayoutTypeEnum
             height = cellsHeight
         }
         else if cellLayoutType == .fixedNumberForRow {
-            var cfr : Int = 1
-            
-            if UIDevice.current.userInterfaceIdiom == .pad {
-                if UIApplication.shared.statusBarOrientation == UIInterfaceOrientation.portrait || UIApplication.shared.statusBarOrientation == UIInterfaceOrientation.portraitUpsideDown {
-                    cfr = cellsForRow.ipadPortrait
-                }
-                else {
-                    cfr = cellsForRow.ipadLandscape
-                }
-            }
-            else {
-                if UIApplication.shared.statusBarOrientation == UIInterfaceOrientation.portrait || UIApplication.shared.statusBarOrientation == UIInterfaceOrientation.portraitUpsideDown {
-                    cfr = cellsForRow.iphonePortrait
-                }
-                else {
-                    cfr = cellsForRow.iphoneLandscape
-                }
-            }
-            
+            let cfr : Int = pickCorrectCellsForRow()
             width = (self.frame.size.width / CGFloat(cfr)) - CGFloat(cellSpacing.left + cellSpacing.right)
             height = CGFloat(width * cellProportions.height / cellProportions.width) - CGFloat(cellSpacing.top + cellSpacing.bottom)
         }
@@ -414,6 +463,14 @@ public typealias CellLayoutType = CellLayoutTypeEnum
     }
     
     func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, targetContentOffsetForProposedContentOffset proposedContentOffset: CGPoint) -> CGPoint {
+        if flowLayout?.scrollDirection == .horizontal && triggeredHorizontalPullToRefresh && contentOffset.y <= 0 {
+            setContentOffset(CGPoint.init(x: lastOffsetX, y: proposedContentOffset.y), animated: true)
+            return CGPoint.init(x: lastOffsetX, y: proposedContentOffset.y)
+        }
+        return proposedContentOffset
     }
     
 }
