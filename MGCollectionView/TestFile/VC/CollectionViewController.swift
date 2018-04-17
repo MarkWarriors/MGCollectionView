@@ -77,7 +77,7 @@ class CollectionViewController: UIViewController, MGCollectionViewProtocol {
         let itemPerPage : Int = 15
         if testWithRequest {
             print("Collection view request page \(page) - Test with web request")
-            DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(5), execute: { // Just for show the loader
+            DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(1), execute: { // Just for show the loader
                 var request = URLRequest(url: self.spacexLaunchUrl)
                 request.httpMethod = "GET"
                 
