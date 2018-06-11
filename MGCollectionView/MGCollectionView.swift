@@ -399,14 +399,14 @@ public typealias CellLayoutType = CellLayoutTypeEnum
         }
         if items.count > indexPath.row {
             let item = items[indexPath.row]
-            protocolDelegate?.collectionViewSelected(cell: cellForItem(at: indexPath)!, withItem: item)
+            protocolDelegate?.collectionViewSelected?(cell: cellForItem(at: indexPath)!, withItem: item)
         }
     }
     
     internal func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
         if items.count > indexPath.row {
             let item = items[indexPath.row]
-            protocolDelegate?.collectionViewDeselected(cell: cellForItem(at: indexPath)!, withItem: item)
+            protocolDelegate?.collectionViewDeselected?(cell: cellForItem(at: indexPath)!, withItem: item)
         }
     }
     
