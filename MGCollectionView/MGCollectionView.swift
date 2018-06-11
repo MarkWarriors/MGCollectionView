@@ -11,6 +11,7 @@ import UIKit
 
 @objc protocol MGCollectionViewProtocol {
     @objc func collectionViewSelected(cell: UICollectionViewCell, withItem item: Any)
+    @objc func collectionViewDeselected(cell: UICollectionViewCell, withItem item: Any)
     @objc func collectionViewDisplayItem(_ item: Any, inCell cell: UICollectionViewCell) -> UICollectionViewCell
     @objc func collectionViewRequestDataForPage(page: Int, valuesCallback: @escaping ([Any]?)->())
     @objc optional func collectionViewPullToRefreshControlStatusIs(animating: Bool)
@@ -399,6 +400,13 @@ public typealias CellLayoutType = CellLayoutTypeEnum
         if items.count > indexPath.row {
             let item = items[indexPath.row]
             protocolDelegate?.collectionViewSelected(cell: cellForItem(at: indexPath)!, withItem: item)
+        }
+    }
+    
+    internal func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
+        if items.count > indexPath.row {
+            let item = items[indexPath.row]
+            protocolDelegate?.collectionViewDeselected(cell: cellForItem(at: indexPath)!, withItem: item)
         }
     }
     
