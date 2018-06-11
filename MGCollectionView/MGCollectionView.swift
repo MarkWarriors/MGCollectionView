@@ -10,10 +10,10 @@ import UIKit
 
 
 @objc protocol MGCollectionViewProtocol {
-    @objc func collectionViewSelected(cell: UICollectionViewCell, withItem item: Any)
-    @objc func collectionViewDeselected(cell: UICollectionViewCell, withItem item: Any)
     @objc func collectionViewDisplayItem(_ item: Any, inCell cell: UICollectionViewCell) -> UICollectionViewCell
     @objc func collectionViewRequestDataForPage(page: Int, valuesCallback: @escaping ([Any]?)->())
+    @objc optional func collectionViewSelected(cell: UICollectionViewCell, withItem item: Any)
+    @objc optional func collectionViewDeselected(cell: UICollectionViewCell, withItem item: Any)
     @objc optional func collectionViewPullToRefreshControlStatusIs(animating: Bool)
     @objc optional func collectionViewEndUpdating(totalElements: Int)
 }
